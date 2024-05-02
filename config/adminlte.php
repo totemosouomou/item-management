@@ -293,13 +293,29 @@ return [
         [
             'text' => '商品一覧',
             'url'  => 'items',
-            'icon' => 'fas fa-gamepad',
+            'icon' => 'fas fa-file',
         ],
         ['header' => 'account_settings'],
         [
             'text' => '自分の登録商品',
             'url'  => 'items/user/admin',
             'icon' => 'fas fa-fw fa-user',
+        ],
+        ['header' => '新着商品'],
+        [
+            'text'       => '四半期中の商品',
+            'icon_color' => 'red',
+            'url'        => 'items/quarter',
+        ],
+        [
+            'text'       => '30日以内の商品',
+            'icon_color' => 'yellow',
+            'url'        => 'items/30days',
+        ],
+        [
+            'text'       => '1週間以内の商品',
+            'icon_color' => 'cyan',
+            'url'        => 'items/week',
         ],
         // AdminLTEデフォルト
         /*

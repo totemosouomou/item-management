@@ -27,6 +27,10 @@ class ItemController extends Controller
      */
     public function index($user_id = null)
     {
+        if ($user_id == "admin") {
+            return redirect()->route('index.user', ['user_id' => auth()->id()]);
+        }
+
         // バリデーション: ユーザーIDが指定されている場合は存在するかチェックする
         if ($user_id) {
             $user = User::find($user_id);
@@ -37,7 +41,7 @@ class ItemController extends Controller
 
         // 商品一覧取得
         if ($user_id) {
-            $user_name = $user->name . "の商品";
+            $user_name = $user->name . "さんの商品";
             $items = Item::where('user_id', $user_id)->get();
         } else {
             $user_name = "全商品";
@@ -47,7 +51,6 @@ class ItemController extends Controller
     return view('item.index', compact('items', 'user_name'));
 
     }
-
 
     /**
      * 商品登録

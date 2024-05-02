@@ -22,7 +22,10 @@ Auth::routes();
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::prefix('items')->group(function () {
+    // 商品一覧を表示するルート
     Route::get('/', [App\Http\Controllers\ItemController::class, 'index']);
+    // 特定のユーザーに関連付けられた商品一覧を表示するルート
+    Route::get('/user/{user_id}', [App\Http\Controllers\ItemController::class, 'index'])->name('index.user');
     Route::get('/add', [App\Http\Controllers\ItemController::class, 'add']);
     Route::post('/add', [App\Http\Controllers\ItemController::class, 'add']);
     Route::get('/delete', [App\Http\Controllers\ItemController::class, 'delete']);

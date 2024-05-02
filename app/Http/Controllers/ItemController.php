@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use App\Models\Item;
 
 class ItemController extends Controller
@@ -20,14 +21,33 @@ class ItemController extends Controller
 
     /**
      * 商品一覧
+     *
+     * @param int|null $user_id
+     * @return \Illuminate\Contracts\View\View
      */
-    public function index()
+    public function index($user_id = null)
     {
-        // 商品一覧取得
-        $items = Item::all();
+        // バリデーション: ユーザーIDが指定されている場合は存在するかチェックする
+        if ($user_id) {
+            $user = User::find($user_id);
+            if (!$user) {
+                return redirect('/items')->with('error', '指定されたユーザーが見つかりませんでした');
+            }
+        }
 
-        return view('item.index', compact('items'));
+        // 商品一覧取得
+        if ($user_id) {
+            $user_name = $user->name . "の商品";
+            $items = Item::where('user_id', $user_id)->get();
+        } else {
+            $user_name = "全商品";
+            $items = Item::all();
+        }
+
+    return view('item.index', compact('items', 'user_name'));
+
     }
+
 
     /**
      * 商品登録
@@ -72,10 +92,10 @@ class ItemController extends Controller
 
                 return redirect('/items')->with('success', '商品を削除しました');
             } else {
-                return redirect('/items')->with('error', '商品が見つかりませんでした');
+                return redirect('/items')->with('error', '指定された商品が見つかりませんでした');
             }
         }
 
-        return redirect('/items');
+        return redirect('/items')->with('error', '指定された商品が見つかりませんでした');
     }
 }

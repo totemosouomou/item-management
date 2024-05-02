@@ -7,6 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Item extends Model
 {
     /**
+     * アイテムを所有するユーザーを取得します。
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>

@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('user_id')->unsigned()->index();
+            $table->foreignId('user_id')->constrained()->index();
             $table->string('name', 100)->index();
-            $table->string('url', 100)->nullable();
+            $table->string('url');
             $table->string('detail', 500)->nullable();
             $table->timestamps();
         });

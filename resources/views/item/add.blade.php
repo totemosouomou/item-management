@@ -21,7 +21,7 @@
 
         <div class="card card-primary">
             <div class="card-header" id="accordionHeader">
-                <h3 class="card-title">URL入力</h3>
+                <h3 class="card-title">記事のURL・見出しの入力は必須項目です</h3>
                 <div class="card-tools">
                     <button class="btn btn-tool" data-toggle="collapse" data-target="#accordionContent" aria-expanded="false" aria-controls="accordionContent">
                         <i class="fas fa-plus"></i>
@@ -34,13 +34,13 @@
                         <div class="form-group row">
                             <label for="url" class="col-sm-2 col-form-label">URL</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="url" name="url" placeholder="URL">
+                                <input type="text" class="form-control" id="url" name="url" placeholder="URL" value="{{ old('url') }}">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="name" class="col-sm-2 col-form-label">見出し</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="name" name="name" placeholder="見出し">
+                                <input type="text" class="form-control" id="name" name="name" placeholder="見出し" value="{{ old('name') }}">
                             </div>
                         </div>
                     </div>
@@ -49,7 +49,7 @@
                             <div class="form-group row">
                                 <label for="detail" class="col-sm-2 col-form-label">詳細</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="detail" name="detail" placeholder="詳細説明">
+                                    <input type="text" class="form-control" id="detail" name="detail" placeholder="詳細" value="{{ old('detail') }}">
                                 </div>
                             </div>
                         </div>

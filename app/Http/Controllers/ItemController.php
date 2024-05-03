@@ -100,10 +100,27 @@ class ItemController extends Controller
     {
         // POSTリクエストのとき
         if ($request->isMethod('post')) {
-            // バリデーション
-            $this->validate($request, [
-                'name' => 'required|max:100',
-            ]);
+            // バリデーションルールを設定
+            $rules = [
+                'url' => 'required|url|starts_with:http,https',
+                'name' => 'required|string|max:100',
+                'detail' => 'nullable|string|max:500',
+            ];
+
+            // カスタムエラーメッセージを定義
+            $messages = [
+                'url.required' => 'URLは必須項目です。',
+                'url.url' => '有効なURLを入力してください。',
+                'url.starts_with' => '有効なHTTPまたはHTTPSのURLを入力してください。',
+                'name.required' => '見出しは必須項目です。',
+                'name.string' => '見出しは文字列で入力してください。',
+                'name.max' => '見出しは100文字以内で入力してください。',
+                'detail.string' => '詳細は文字列で入力してください。',
+                'detail.max' => '詳細は500文字以内で入力してください。',
+            ];
+
+            // バリデーションを実行
+            $request->validate($rules, $messages);
 
             // 記事登録
             Item::create([

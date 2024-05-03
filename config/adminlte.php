@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => '商品管理',
+    'title' => '記事管理',
     'title_prefix' => '',
     'title_postfix' => '',
 
@@ -63,12 +63,12 @@ return [
     |
     */
 
-    'logo' => '<b>商品管理</b>',
+    'logo' => '<b>記事管理</b>',
     'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => '商品管理',
+    'logo_img_alt' => '記事管理',
 
     /*
     |--------------------------------------------------------------------------
@@ -291,29 +291,34 @@ return [
 
     'menu' => [
         [
-            'text' => '商品一覧',
+            'text' => '一覧表示',
             'url'  => 'items',
+            'icon' => 'fas fa-file',
+        ],
+        [
+            'text' => '記事登録',
+            'url'  => 'items/add',
             'icon' => 'fas fa-file',
         ],
         ['header' => 'account_settings'],
         [
-            'text' => '自分の登録商品',
+            'text' => '自分の登録記事',
             'url'  => 'items/user/admin',
             'icon' => 'fas fa-fw fa-user',
         ],
-        ['header' => '新着商品'],
+        ['header' => '新着記事'],
         [
-            'text'       => '四半期中の商品',
+            'text'       => '四半期中の記事',
             'icon_color' => 'red',
             'url'        => 'items/quarter',
         ],
         [
-            'text'       => '30日以内の商品',
+            'text'       => '30日以内の記事',
             'icon_color' => 'yellow',
             'url'        => 'items/30days',
         ],
         [
-            'text'       => '1週間以内の商品',
+            'text'       => '1週間以内の記事',
             'icon_color' => 'cyan',
             'url'        => 'items/week',
         ],

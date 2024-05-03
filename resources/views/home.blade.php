@@ -7,7 +7,7 @@
 @stop
 
 @section('content')
-    <p>登録商品点数の多い順ランキング上位者</p>
+    <p>登録記事点数の多い順ランキング上位者</p>
     <!-- resources/views/home.blade.php -->
     <div>
         <canvas id="myChart" height="100%"></canvas>
@@ -43,7 +43,7 @@
                 data: {
                     labels: finalLabels,
                     datasets: [{
-                        label: '商品点数 / 1アカウントあたり',
+                        label: '記事点数 / 1アカウントあたり',
                         data: finalData,
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',

@@ -21,7 +21,7 @@ class ItemController extends Controller
     }
 
     /**
-     * 商品一覧
+     * 記事一覧
      *
      * @param int|null $user_id
      * @return \Illuminate\Contracts\View\View
@@ -40,12 +40,12 @@ class ItemController extends Controller
             }
         }
 
-        // 商品一覧取得
+        // 記事一覧取得
         if ($user_id) {
-            $user_name = $user->name . "さんの商品";
+            $user_name = $user->name . "さんの記事";
             $items = Item::where('user_id', $user_id)->get();
         } else {
-            $user_name = "全商品";
+            $user_name = "全記事";
             $items = Item::all();
         }
 
@@ -54,7 +54,7 @@ class ItemController extends Controller
     }
 
     /**
-     * 四半期中の商品一覧
+     * 四半期中の記事一覧
      *
      * @return \Illuminate\Contracts\View\View
      */
@@ -63,12 +63,12 @@ class ItemController extends Controller
         $startOfQuarter = Carbon::now()->startOfQuarter();
         $endOfQuarter = Carbon::now()->endOfQuarter();
         $items = Item::whereBetween('created_at', [$startOfQuarter, $endOfQuarter])->get();
-        $user_name = "四半期中の商品";
+        $user_name = "四半期中の記事";
         return view('item.index', compact('items', 'user_name'));
     }
 
     /**
-     * 30日以内の商品一覧
+     * 30日以内の記事一覧
      *
      * @return \Illuminate\Contracts\View\View
      */
@@ -76,12 +76,12 @@ class ItemController extends Controller
     {
         $startOfLast30Days = Carbon::now()->subDays(30)->startOfDay();
         $items = Item::where('created_at', '>=', $startOfLast30Days)->get();
-        $user_name = "30日以内の商品";
+        $user_name = "30日以内の記事";
         return view('item.index', compact('items', 'user_name'));
     }
 
     /**
-     * 1週間以内の商品一覧
+     * 1週間以内の記事一覧
      *
      * @return \Illuminate\Contracts\View\View
      */
@@ -89,12 +89,12 @@ class ItemController extends Controller
     {
         $startOfLastWeek = Carbon::now()->subWeek()->startOfWeek();
         $items = Item::where('created_at', '>=', $startOfLastWeek)->get();
-        $user_name = "1週間以内の商品";
+        $user_name = "1週間以内の記事";
         return view('item.index', compact('items', 'user_name'));
     }
 
     /**
-     * 商品登録
+     * 記事登録
      */
     public function add(Request $request)
     {
@@ -105,11 +105,11 @@ class ItemController extends Controller
                 'name' => 'required|max:100',
             ]);
 
-            // 商品登録
+            // 記事登録
             Item::create([
                 'user_id' => Auth::user()->id,
                 'name' => $request->name,
-                'type' => $request->type,
+                'url' => $request->url,
                 'detail' => $request->detail,
             ]);
 
@@ -120,26 +120,26 @@ class ItemController extends Controller
     }
 
     /**
-     * 商品削除
+     * 記事削除
      */
     public function delete(Request $request)
     {
         // POSTリクエストのとき
         if ($request->isMethod('post')) {
-            // 削除する商品を取得
+            // 削除する記事を取得
             $item = Item::find($request->id);
 
-            // 商品が存在するか確認
+            // 記事が存在するか確認
             if ($item) {
-                // 商品を削除
+                // 記事を削除
                 $item->delete();
 
-                return redirect('/items')->with('success', '商品を削除しました');
+                return redirect('/items')->with('success', '記事を削除しました');
             } else {
-                return redirect('/items')->with('error', '指定された商品が見つかりませんでした');
+                return redirect('/items')->with('error', '指定された記事が見つかりませんでした');
             }
         }
 
-        return redirect('/items')->with('error', '指定された商品が見つかりませんでした');
+        return redirect('/items')->with('error', '指定された記事が見つかりませんでした');
     }
 }

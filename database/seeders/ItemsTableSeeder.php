@@ -23,7 +23,7 @@ class ItemsTableSeeder extends Seeder
             DB::table('items')->insert([
                 'user_id' => rand(1, 6), // ユーザーIDを1から6の範囲でランダムに設定
                 'name' => Str::random(10), // 10文字のランダムな文字列
-                'type' => Str::random(10), // 10文字のランダムな文字列
+                'url' => Str::random(10), // 10文字のランダムな文字列
                 'detail' => Str::random(10), // 10文字のランダムな文字列
                 'created_at' => $createdAt, // 0〜210日前のランダムな日時を設定
                 'updated_at' => $createdAt, // created_atと同じ日時を設定

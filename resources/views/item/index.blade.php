@@ -54,14 +54,14 @@
                                         <p class="ms-5"><a href="{{ $item->url }}" style="text-decoration: none;">{{ $item->url }}</a><br>{{ $item->detail }}</p>
                                         <div class="modal-body">
                                             <!-- 削除フォーム -->
-                                            <form method="post" action="{{ url('items/delete') }}">
+                                            <form method="POST" action="{{ url('items/delete') }}">
                                                 @csrf
                                                 <input type="hidden" name="id" value="{{ $item->id }}">
                                                 <button type="submit" class="btn btn-danger">削除</button>
                                             </form>
                                             <div class="iframely-embed">
                                                 <div class="iframely-responsive" style="height: 170px; padding-bottom: 0;">
-                                                    <a href="{{ $item->url }}" data-iframely-url="https://cdn.iframe.ly/api/iframe?url={{ $item->url }}&media=0&api_key=f8a855acb80aba3b141b3c"></a>
+                                                    <a href="{{ $item->url }}" data-iframely-url="//cdn.iframe.ly/api/iframe?url={{ $item->url }}&media=0&api_key={{ config('iframely.api.key') }}"></a>
                                                 </div>
                                             </div>
                                         </div>
@@ -108,19 +108,14 @@
         }
 
         .modal-dialog {
-            max-width: 800px !important;
-            max-height: 400px !important;
+            max-width: 800px;
+            max-height: 400px;
         }
     </style>
 @stop
 
 @section('js')
-<script async src="https://cdn.iframe.ly/embed.js" charset="utf-8"></script>
-
     <script>
-        // APIキーをセキュアに保持する
-        var api_key = 'f8a855acb80aba3b141b3c'; // あなたのAPIキーをここに入力
-
         // モーダルが表示される度に呼び出し元のitems->urlを取得して表示
         $('.modal').on('shown.bs.modal', function (e) {
             var modal = $(this);

@@ -46,19 +46,24 @@
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="urlModalLabel{{ $item->id }}">URL</h5>
+                                            <h5 class="modal-title text-dark font-weight-bold" id="urlModalLabel{{ $item->id }}">{{ $item->name }}</h5>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
+                                        <p class="ms-5"><a href="{{ $item->url }}" style="text-decoration: none;">{{ $item->url }}</a><br>{{ $item->detail }}</p>
                                         <div class="modal-body">
                                             <!-- 削除フォーム -->
                                             <form method="post" action="{{ url('items/delete') }}">
                                                 @csrf
                                                 <input type="hidden" name="id" value="{{ $item->id }}">
-                                                <p>削除しますか？</p>
                                                 <button type="submit" class="btn btn-danger">削除</button>
                                             </form>
+                                            <div class="iframely-embed">
+                                                <div class="iframely-responsive" style="height: 170px; padding-bottom: 0;">
+                                                    <a href="{{ $item->url }}" data-iframely-url="https://cdn.iframe.ly/api/iframe?url={{ $item->url }}&media=0&api_key=f8a855acb80aba3b141b3c"></a>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -73,6 +78,10 @@
 
 @section('css')
     <style>
+        .ms-5 {
+            margin-left: 16px;
+        }
+
         .contents {
             position: relative;
             padding-left: 10px;
@@ -97,10 +106,17 @@
             height: 3px;
             background-color: rgba(144, 238, 144, 0.5);
         }
+
+        .modal-dialog {
+            max-width: 800px !important;
+            max-height: 400px !important;
+        }
     </style>
 @stop
 
 @section('js')
+<script async src="https://cdn.iframe.ly/embed.js" charset="utf-8"></script>
+
     <script>
         // APIキーをセキュアに保持する
         var api_key = 'f8a855acb80aba3b141b3c'; // あなたのAPIキーをここに入力
@@ -108,26 +124,10 @@
         // モーダルが表示される度に呼び出し元のitems->urlを取得して表示
         $('.modal').on('shown.bs.modal', function (e) {
             var modal = $(this);
-            var url = $(e.relatedTarget).data('item-url'); // モーダルを呼び出した要素からitemsのIDを取得
-
-            // APIキーを含めない形でoEmbed APIにアクセスし、データを取得する
-            $.ajax({
-                url: `https://iframe.ly/api/oembed?url=${encodeURIComponent(url)}&api_key=${api_key}`,
-                success: function (data) {
-                    // oEmbedから取得した情報をモーダル内に表示する
-                    var modalContent = `
-                        <h5>${data.title}</h5>
-                        <p>${data.description}</p>
-                        ${data.html}
-                    `;
-                    $('#modalContent').html(modalContent);
-                },
-                error: function(xhr, status, error) {
-                    // エラーハンドリングを行う場合はここに記述する
-                    console.error(error);
-                }
-            });
+            var url = $(e.relatedTarget).data('item-url'); // モーダルを呼び出した要素からitemsのURLを取得
+            console.log(url);
         });
     </script>
 @stop
+
 

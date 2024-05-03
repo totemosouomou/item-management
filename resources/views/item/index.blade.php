@@ -36,15 +36,10 @@
                 <div class="card-body">
                     <div class="d-flex flex-wrap">
                         @foreach ($items as $item)
-                            <figure class="m-3" data-toggle="modal" data-target="#urlModal{{ $item->id }}">
-                                <figcaption class="text-dark font-weight-bold">{{ $item->name }}</figcaption>
-                                <p>{{ $item->url }}</p>
-                                <form method="post" action="{{ url('items/delete') }}" onsubmit="return confirm('削除します。よろしいでしょうか？');">
-                                    @csrf
-                                    <input type="hidden" name="id" value="{{ $item->id }}">
-                                    <input type="submit" value="削除" class="btn btn-danger">
-                                </form>
-                            </figure>
+                        <figure class="m-3 contents" data-toggle="modal" data-target="#urlModal{{ $item->id }}" data-item-url="{{ $item->url }}">
+                            <figcaption class="text-dark font-weight-bold">{{ $item->name }}</figcaption>
+                            <p>{{ $item->url }}</p>
+                        </figure>
 
                             <!-- URL表示用のモーダル -->
                             <div class="modal fade" id="urlModal{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="urlModalLabel{{ $item->id }}" aria-hidden="true">
@@ -57,7 +52,13 @@
                                             </button>
                                         </div>
                                         <div class="modal-body">
-                                            <div id="urlContent{{ $item->id }}"></div>
+                                            <!-- 削除フォーム -->
+                                            <form method="post" action="{{ url('items/delete') }}">
+                                                @csrf
+                                                <input type="hidden" name="id" value="{{ $item->id }}">
+                                                <p>削除しますか？</p>
+                                                <button type="submit" class="btn btn-danger">削除</button>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -71,21 +72,62 @@
 @stop
 
 @section('css')
+    <style>
+        .contents {
+            position: relative;
+            padding-left: 10px;
+        }
+
+        .contents::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 0;
+            width: 3px;
+            height: 20px;
+            background-color: rgba(144, 238, 144, 0.5);
+        }
+
+        .contents::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 0;
+            width: 20px;
+            height: 3px;
+            background-color: rgba(144, 238, 144, 0.5);
+        }
+    </style>
 @stop
 
 @section('js')
     <script>
-        // モーダルが表示される度にAjaxで外部コンテンツを取得
+        // APIキーをセキュアに保持する
+        var api_key = 'f8a855acb80aba3b141b3c'; // あなたのAPIキーをここに入力
+
+        // モーダルが表示される度に呼び出し元のitems->urlを取得して表示
         $('.modal').on('shown.bs.modal', function (e) {
             var modal = $(this);
-            var id = modal.attr('id').replace('urlModal', '');
-            var url = '{{ $item->url }}';
+            var url = $(e.relatedTarget).data('item-url'); // モーダルを呼び出した要素からitemsのIDを取得
+
+            // APIキーを含めない形でoEmbed APIにアクセスし、データを取得する
             $.ajax({
-                url: url,
+                url: `https://iframe.ly/api/oembed?url=${encodeURIComponent(url)}&api_key=${api_key}`,
                 success: function (data) {
-                    $('#urlContent' + id).html(data); // 取得したデータをモーダル内に表示
+                    // oEmbedから取得した情報をモーダル内に表示する
+                    var modalContent = `
+                        <h5>${data.title}</h5>
+                        <p>${data.description}</p>
+                        ${data.html}
+                    `;
+                    $('#modalContent').html(modalContent);
+                },
+                error: function(xhr, status, error) {
+                    // エラーハンドリングを行う場合はここに記述する
+                    console.error(error);
                 }
             });
         });
     </script>
 @stop
+

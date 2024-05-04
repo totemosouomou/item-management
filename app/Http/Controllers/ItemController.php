@@ -21,6 +21,39 @@ class ItemController extends Controller
     }
 
     /**
+     * バリデーションルールの定義
+     *
+     * @return array
+     */
+    private function validationRules()
+    {
+        return [
+            'url' => 'required|url|starts_with:http,https',
+            'name' => 'required|string|max:100',
+            'detail' => 'nullable|string|max:500',
+        ];
+    }
+
+    /**
+     * バリデーションメッセージの定義
+     *
+     * @return array
+     */
+    private function validationMessages()
+    {
+        return [
+            'url.required' => 'URLは必須項目です。',
+            'url.url' => '有効なURLを入力してください。',
+            'url.starts_with' => '有効なHTTPまたはHTTPSのURLを入力してください。',
+            'name.required' => '見出しは必須項目です。',
+            'name.string' => '見出しは文字列で入力してください。',
+            'name.max' => '見出しは100文字以内で入力してください。',
+            'detail.string' => '詳細は文字列で入力してください。',
+            'detail.max' => '詳細は500文字以内で入力してください。',
+        ];
+    }
+
+    /**
      * 記事一覧
      *
      * @param int|null $user_id
@@ -95,32 +128,17 @@ class ItemController extends Controller
 
     /**
      * 記事登録
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
     public function add(Request $request)
     {
         // POSTリクエストのとき
         if ($request->isMethod('post')) {
-            // バリデーションルールを設定
-            $rules = [
-                'url' => 'required|url|starts_with:http,https',
-                'name' => 'required|string|max:100',
-                'detail' => 'nullable|string|max:500',
-            ];
-
-            // カスタムエラーメッセージを定義
-            $messages = [
-                'url.required' => 'URLは必須項目です。',
-                'url.url' => '有効なURLを入力してください。',
-                'url.starts_with' => '有効なHTTPまたはHTTPSのURLを入力してください。',
-                'name.required' => '見出しは必須項目です。',
-                'name.string' => '見出しは文字列で入力してください。',
-                'name.max' => '見出しは100文字以内で入力してください。',
-                'detail.string' => '詳細は文字列で入力してください。',
-                'detail.max' => '詳細は500文字以内で入力してください。',
-            ];
 
             // バリデーションを実行
-            $request->validate($rules, $messages);
+            $request->validate($this->validationRules(), $this->validationMessages());
 
             // 記事登録
             Item::create([
@@ -137,12 +155,43 @@ class ItemController extends Controller
     }
 
     /**
+     * 記事更新
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request)
+    {
+        // POSTリクエストのとき
+        if ($request->isMethod('post')) {
+
+            // バリデーションを実行
+            $request->validate($this->validationRules(), $this->validationMessages());
+
+            // 記事更新
+            Item::where('id', $request->id)->update([
+                'name' => $request->name,
+                'url' => $request->url,
+                'detail' => $request->detail,
+            ]);
+
+            return redirect('/items')->with('success', '記事が更新されました。');
+        }
+
+        return view('item.index');
+    }
+
+    /**
      * 記事削除
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
     public function delete(Request $request)
     {
         // POSTリクエストのとき
         if ($request->isMethod('post')) {
+
             // 削除する記事を取得
             $item = Item::find($request->id);
 

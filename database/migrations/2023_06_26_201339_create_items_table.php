@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->index();
+            $table->foreignId('user_id')->constrained()->index()->name('items_user_id_foreign');
             $table->string('name', 100)->index();
             $table->text('url');
-            $table->string('detail', 500)->nullable();
             $table->timestamps();
         });
     }

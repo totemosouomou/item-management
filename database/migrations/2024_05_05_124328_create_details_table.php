@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('details', function (Blueprint $table) {
+        Schema::create('comennts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->index();
-            $table->foreignId('item_id')->constrained()->index();
-            $table->string('detail', 255);
+            $table->foreignId('user_id')->constrained()->index()->name('details_user_id_foreign');
+            $table->foreignId('item_id')->constrained()->index()->name('details_item_id_foreign');
+            $table->string('detail', 255)->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('details');
+        Schema::dropIfExists('comments');
     }
 };

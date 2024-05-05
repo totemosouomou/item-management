@@ -48,7 +48,7 @@
                         @foreach ($items as $item)
                         <figure class="m-3 contents" data-toggle="modal" data-target="#urlModal{{ $item->id }}">
                             <figcaption class="text-dark font-weight-bold">{{ $item->name }}</figcaption>
-                                <p>{{ \Illuminate\Support\Str::limit($item->url, 50, $end='...') }}</p>
+                                <p>{{ \Illuminate\Support\Str::limit($item->url, 45, $end='...') }}</p>
                         </figure>
 
                             <!-- URL表示用のモーダル -->
@@ -68,9 +68,21 @@
                                                 {{ \Illuminate\Support\Str::limit($item->url, 80, $end='...') }}
                                             </a>
                                         </p>
-                                        <p class="details ms-5 my-0 text-muted small" id="itemDetail_{{ $item->id }}">
-                                            {{ $item->detail }}
-                                        </p>
+                                        <ul class="details ms-5 mt-1 mb-0 list-unstyled list-inline" id="itemDetail_{{ $item->id }}">
+                                            @php
+                                                $userDetail = null;
+                                            @endphp
+                                            @foreach ($item->details as $detail)
+                                                @if ($detail->user_id == Auth::user()->id)
+                                                    @php
+                                                        $userDetail = str_replace(" by " . Auth::user()->name, "", $detail->detail);
+                                                    @endphp
+                                                @endif
+                                                <li class="list-inline-item" style="background-color: rgba(240, 240, 240, 0.6); border-radius: 100000px; padding: 1px 20px; font-size: 0.8em; color: rgba(0, 0, 0, 0.6);">
+                                                    {{ $detail->detail }}
+                                                </li>
+                                            @endforeach
+                                        </ul>
 
                                         <div class="modal-body">
 
@@ -80,7 +92,7 @@
                                                 @csrf
                                                 <input type="text" class="form-control mb-2" id="name" name="name" placeholder="見出し" value="{{ $item->name }}">
                                                 <input type="text" class="form-control mb-2" id="url" name="url" placeholder="URL" value="{{ $item->url }}">
-                                                <input type="text" class="form-control mb-2" id="detail" name="detail"  placeholder="{{ $item->detail ? $item->detail : '詳細を入力できます' }}" value="{{ $item->detail }}">
+                                                <input type="text" class="form-control mb-2" id="detail" name="detail"  placeholder="{{ $userDetail ? $userDetail : '詳細を入力できます' }}" value="{{ $userDetail }}">
                                             </div>
 
                                             <!-- ブログカード表示 -->
@@ -94,15 +106,15 @@
                                             <div class="d-flex" style="height: 2.4em;">
                                                 <div class="edit-form m-2 mr-5">
                                                         <input type="hidden" name="id" value="{{ $item->id }}">
-                                                        <p id="editBtn_{{ $item->id }}" class="btn btn-primary rounded-pill" onclick="editItem('{{ $item->id }}');">　編集　</p>
-                                                        <button id="editSubmitBtn_{{ $item->id }}" class="btn btn-primary rounded-pill" style="display: none;">　更新　</button>
+                                                        <p id="editBtn_{{ $item->id }}" class="btn btn-primary rounded-pill" onclick="editItem('{{ $item->id }}');" style="padding: 7px 30px;">編集</p>
+                                                        <button id="editSubmitBtn_{{ $item->id }}" class="btn btn-primary rounded-pill" style="display: none; padding: 7px 30px;">更新</button>
                                                     </form>
                                                 </div>
                                                 <div class="delete-form m-2 ms-5">
                                                     <form method="POST" action="{{ url('items/delete') }}">
                                                         @csrf
                                                         <input type="hidden" name="id" value="{{ $item->id }}">
-                                                        <button type="submit" class="btn btn-danger rounded-pill">　削除　</button>
+                                                        <button type="submit" class="btn btn-danger rounded-pill" style="padding: 7px 30px;">削除</button>
                                                     </form>
                                                 </div>
                                             </div>

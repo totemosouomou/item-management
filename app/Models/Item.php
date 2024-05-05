@@ -15,6 +15,14 @@ class Item extends Model
     }
 
     /**
+     * このアイテムに関連する詳細を取得
+     */
+    public function details()
+    {
+        return $this->hasMany(Detail::class);
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -23,7 +31,6 @@ class Item extends Model
         'user_id',
         'name',
         'url',
-        'detail',
     ];
 
     /**

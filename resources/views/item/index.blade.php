@@ -68,18 +68,18 @@
                                                 {{ \Illuminate\Support\Str::limit($item->url, 80, $end='...') }}
                                             </a>
                                         </p>
-                                        <ul class="details ms-5 mt-1 mb-0 list-unstyled list-inline" id="itemDetail_{{ $item->id }}">
+                                        <ul class="posts ms-5 mt-1 mb-0 list-unstyled list-inline" id="itemPost_{{ $item->id }}">
                                             @php
-                                                $userDetail = null;
+                                                $userPost = null;
                                             @endphp
-                                            @foreach ($item->details as $detail)
-                                                @if ($detail->user_id == Auth::user()->id)
+                                            @foreach ($item->posts as $post)
+                                                @if ($post->user_id == Auth::user()->id)
                                                     @php
-                                                        $userDetail = str_replace(" by " . Auth::user()->name, "", $detail->detail);
+                                                        $userPost = str_replace(" by " . Auth::user()->name, "", $post->post);
                                                     @endphp
                                                 @endif
                                                 <li class="list-inline-item" style="background-color: rgba(240, 240, 240, 0.6); border-radius: 100000px; padding: 1px 20px; font-size: 0.8em; color: rgba(0, 0, 0, 0.6);">
-                                                    {{ $detail->detail }}
+                                                    {{ $post->post }}
                                                 </li>
                                             @endforeach
                                         </ul>
@@ -92,7 +92,7 @@
                                                 @csrf
                                                 <input type="text" class="form-control mb-2" id="name" name="name" placeholder="見出し" value="{{ $item->name }}">
                                                 <input type="text" class="form-control mb-2" id="url" name="url" placeholder="URL" value="{{ $item->url }}">
-                                                <input type="text" class="form-control mb-2" id="detail" name="detail"  placeholder="{{ $userDetail ? $userDetail : '詳細を入力できます' }}" value="{{ $userDetail }}">
+                                                <input type="text" class="form-control mb-2" id="post" name="post"  placeholder="{{ $userPost ? $userPost : '詳細を入力できます' }}" value="{{ $userPost }}">
                                             </div>
 
                                             <!-- ブログカード表示 -->
@@ -134,7 +134,7 @@
 
 @section('css')
     <style>
-        .urls, .details {
+        .urls, .posts {
             margin-left: 16px;
         }
 
@@ -179,7 +179,7 @@
         // テキストを元の表示状態に戻す
         document.getElementById('urlModalLabel' + itemId).style.display = 'block';
         document.getElementById('itemUrl_' + itemId).style.display = 'block';
-        document.getElementById('itemDetail_' + itemId).style.display = 'block';
+        document.getElementById('itemPost_' + itemId).style.display = 'block';
 
         // 入力フィールドを非表示にする
         document.getElementById('editBox_' + itemId).style.display = 'none';
@@ -194,7 +194,7 @@
         // テキストを非表示にする
         var nameElement = document.getElementById('urlModalLabel' + itemId).style.display = 'none';
         var urlElement = document.getElementById('itemUrl_' + itemId).style.display = 'none';
-        var detailElement = document.getElementById('itemDetail_' + itemId).style.display = 'none';
+        var postElement = document.getElementById('itemPost_' + itemId).style.display = 'none';
 
         // 入力フィールドを表示する
         document.getElementById('editBox_' + itemId).style.display = 'block';

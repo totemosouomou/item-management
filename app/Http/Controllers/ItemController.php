@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Item;
-use App\Models\Detail;
+use App\Models\Post;
 use Carbon\Carbon;
 
 class ItemController extends Controller
@@ -31,7 +31,7 @@ class ItemController extends Controller
         return [
             'url' => 'required|url|starts_with:http,https',
             'name' => 'required|string|max:100',
-            'detail' => 'nullable|string|max:500',
+            'post' => 'nullable|string|max:500',
         ];
     }
 
@@ -49,8 +49,8 @@ class ItemController extends Controller
             'name.required' => '見出しは必須項目です。',
             'name.string' => '見出しは文字列で入力してください。',
             'name.max' => '見出しは100文字以内で入力してください。',
-            'detail.string' => '詳細は文字列で入力してください。',
-            'detail.max' => '詳細は500文字以内で入力してください。',
+            'post.string' => '詳細は文字列で入力してください。',
+            'post.max' => '詳細は500文字以内で入力してください。',
         ];
     }
 
@@ -77,10 +77,10 @@ class ItemController extends Controller
         // 記事一覧取得
         if ($user_id) {
             $user_name = $user->name . "さんの記事";
-            $items = Item::with('details')->where('user_id', $user_id)->get();
+            $items = Item::with('posts')->where('user_id', $user_id)->get();
         } else {
             $user_name = "全記事";
-            $items = Item::with('details')->get();
+            $items = Item::with('posts')->get();
         }
 
     return view('item.index', compact('items', 'user_name'));
@@ -96,7 +96,7 @@ class ItemController extends Controller
     {
         $startOfQuarter = Carbon::now()->startOfQuarter();
         $endOfQuarter = Carbon::now()->endOfQuarter();
-        $items = Item::with(['details' => function ($query) use ($startOfQuarter, $endOfQuarter) {
+        $items = Item::with(['posts' => function ($query) use ($startOfQuarter, $endOfQuarter) {
             $query->whereBetween('created_at', [$startOfQuarter, $endOfQuarter]);
         }])->get();
         $user_name = "四半期中の記事";
@@ -111,7 +111,7 @@ class ItemController extends Controller
     public function last30DaysItems()
     {
         $startOfLast30Days = Carbon::now()->subDays(30)->startOfDay();
-        $items = Item::with('details')->where('created_at', '>=', $startOfLast30Days)->get();
+        $items = Item::with('posts')->where('created_at', '>=', $startOfLast30Days)->get();
         $user_name = "30日以内の記事";
         return view('item.index', compact('items', 'user_name'));
     }
@@ -124,7 +124,7 @@ class ItemController extends Controller
     public function lastWeekItems()
     {
         $startOfLastWeek = Carbon::now()->subWeek()->startOfWeek();
-        $items = Item::with('details')->where('created_at', '>=', $startOfLastWeek)->get();
+        $items = Item::with('posts')->where('created_at', '>=', $startOfLastWeek)->get();
         $user_name = "1週間以内の記事";
         return view('item.index', compact('items', 'user_name'));
     }
@@ -151,11 +151,11 @@ class ItemController extends Controller
             ]);
 
             // 詳細登録
-            if ($request->detail) {
-                Detail::create([
+            if ($request->post) {
+                Post::create([
                     'user_id' => Auth::id(),
                     'item_id' => $item->id,
-                    'detail' => $request->detail . " by " . Auth::user()->name,
+                    'post' => $request->post . " by " . Auth::user()->name,
                 ]);
             }
 
@@ -186,24 +186,24 @@ class ItemController extends Controller
             ]);
 
             // 詳細更新
-            $detail = Detail::where('user_id', Auth::id())
+            $post = Post::where('user_id', Auth::id())
                             ->where('item_id', $request->id)
                             ->first();
-            if ($detail) {
-                if ($request->detail) {
-                    $detail->update([
-                        'detail' => $request->detail . " by " . Auth::user()->name,
+            if ($post) {
+                if ($request->post) {
+                    $post->update([
+                        'post' => $request->post . " by " . Auth::user()->name,
                     ]);
                 } else {
-                    $detail->delete();
+                    $post->delete();
                 }
 
             // 詳細が存在しない場合は新規作成
-            } elseif ($request->detail) {
-                Detail::create([
+            } elseif ($request->post) {
+                Post::create([
                     'user_id' => Auth::id(),
                     'item_id' => $request->id,
-                    'detail' => $request->detail . " by " . Auth::user()->name,
+                    'post' => $request->post . " by " . Auth::user()->name,
                 ]);
             }
 
@@ -231,7 +231,7 @@ class ItemController extends Controller
             if ($item) {
 
                 // 記事と関連する詳細を削除
-                $item->details()->delete();
+                $item->posts()->delete();
                 $item->delete();
 
                 return redirect('/items')->with('success', '記事を削除しました');

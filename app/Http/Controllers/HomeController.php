@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Item;
-use App\Models\Detail;
+use App\Models\Post;
 
 class HomeController extends Controller
 {
@@ -31,9 +31,9 @@ class HomeController extends Controller
             ->with('user')
             ->get();
 
-        $details = Detail::orderBy('created_at', 'desc')->take(30)->get();
+        $posts = Post::orderBy('created_at', 'desc')->take(30)->get();
 
         // ビューにデータを渡す
-        return view('home', compact('itemsPerUser', 'details'));
+        return view('home', compact('itemsPerUser', 'posts'));
     }
 }

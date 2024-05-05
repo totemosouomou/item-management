@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Detail extends Model
+class Post extends Model
 {
     /**
      * 詳細情報を所有するユーザーを取得します。
@@ -25,6 +25,6 @@ class Detail extends Model
     protected $fillable = [
         'user_id',
         'item_id',
-        'detail',
+        'post',
     ];
 }

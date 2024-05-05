@@ -47,9 +47,9 @@
                     <div id="accordionContent" class="collapse" aria-labelledby="accordionHeader">
                         <div class="card-body pt-0">
                             <div class="form-group row">
-                                <label for="detail" class="col-sm-2 col-form-label">詳細</label>
+                                <label for="post" class="col-sm-2 col-form-label">詳細</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="detail" name="detail" placeholder="詳細" value="{{ old('detail') }}">
+                                    <input type="text" class="form-control" id="post" name="post" placeholder="詳細" value="{{ old('post') }}">
                                 </div>
                             </div>
                         </div>

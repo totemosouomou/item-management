@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 
-class DetailsTableSeeder extends Seeder
+class PostsTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -50,20 +50,20 @@ class DetailsTableSeeder extends Seeder
                 // ユーザーを取得
                 $user = User::find($j);
 
-                // Detailを作成
-                DB::table('details')->insert([
+                // Postを作成
+                DB::table('posts')->insert([
                     'user_id' => $user->id,
                     'item_id' => $i,
-                    'detail' => $randomComment['comment'] . " by " . $user->name,
+                    'post' => $randomComment['comment'] . " by " . $user->name,
                 ]);
             }
         }
 
         // 生成したレコードをランダムに削除する
         $deleteCount = 30;
-        $details = DB::table('details')->inRandomOrder()->take($deleteCount)->pluck('id');
+        $posts = DB::table('posts')->inRandomOrder()->take($deleteCount)->pluck('id');
 
-        DB::table('details')->whereIn('id', $details)->delete();
+        DB::table('posts')->whereIn('id', $posts)->delete();
 
     }
 }

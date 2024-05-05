@@ -17,9 +17,9 @@ class Item extends Model
     /**
      * このアイテムに関連する詳細を取得
      */
-    public function details()
+    public function posts()
     {
-        return $this->hasMany(Detail::class);
+        return $this->hasMany(Post::class);
     }
 
     /**

@@ -9,9 +9,18 @@
 @section('content')
     <p>登録記事点数の多い順ランキング上位者</p>
     <!-- resources/views/home.blade.php -->
-    <div>
+    <div class="mb-5">
         <canvas id="myChart" height="100%"></canvas>
     </div>
+
+    <p class="mt-5">各記事へ詳細情報を入力した　私は偉い！</p>
+    <ul class="details ms-5 mt-1 mb-0 list-unstyled list-inline">
+        @foreach ($details as $detail)
+            <li class="list-inline-item" style="background-color: rgba(240, 240, 240, 0.6); border-radius: 100000px; padding: 1px 20px; font-size: 0.8em; color: rgba(0, 0, 0, 0.6);">
+                {{ $detail->detail }}
+            </li>
+        @endforeach
+    </ul>
 @stop
 
 @section('css')

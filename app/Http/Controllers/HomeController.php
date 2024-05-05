@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Item;
 use Illuminate\Support\Facades\DB;
+use App\Models\Item;
+use App\Models\Detail;
 
 class HomeController extends Controller
 {
@@ -27,10 +28,12 @@ class HomeController extends Controller
     {
         $itemsPerUser = Item::select('user_id', DB::raw('count(*) as total'))
             ->groupBy('user_id')
-            ->with('user') // 'user' はItemモデルに定義されたユーザーリレーションを指します
+            ->with('user')
             ->get();
 
+        $details = Detail::orderBy('created_at', 'desc')->take(30)->get();
+
         // ビューにデータを渡す
-        return view('home', compact('itemsPerUser'));
+        return view('home', compact('itemsPerUser', 'details'));
     }
 }

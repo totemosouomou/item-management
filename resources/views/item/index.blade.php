@@ -147,19 +147,19 @@
                                                 @csrf
                                                 <div class="row">
                                                     <div class="col-sm-1">
-                                                        <label for="title" class="form-label-sm text-muted">Title</label>
+                                                        <label for="title" class="form-label-sm text-muted" style="position: relative; top: -5px;">Title</label>
                                                     </div>
                                                     <div class="col-sm-11">
                                                         <input type="text" class="form-control mb-2" style="position: relative; top: -10px;" name="title" placeholder="記事のタイトルなど、わかりやすい見出しにしましょう" value="{{ $item->title }}">
                                                     </div>
                                                     <div class="col-sm-1">
-                                                        <label for="url" class="form-label-sm text-muted">URL</label>
+                                                        <label for="url" class="form-label-sm text-muted" style="position: relative; top: -5px;">URL</label>
                                                     </div>
                                                     <div class="col-sm-11">
                                                         <input type="text" class="form-control mb-2" style="position: relative; top: -10px;" name="url" placeholder="リンク先となる記事のURLを入力しましょう" value="{{ $item->url }}">
                                                     </div>
                                                     <div class="col-sm-1">
-                                                        <label for="post" class="form-label-sm text-muted">Post</label>
+                                                        <label for="post" class="form-label-sm text-muted" style="position: relative; top: 5px;">Post</label>
                                                     </div>
                                                     <div class="col-sm-11">
                                                         <input type="text" class="form-control mb-2" name="post"  placeholder="{{ $userPost ? $userPost : 'コメントを入力できます' }}" value="{{ $userPost }}">

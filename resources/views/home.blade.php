@@ -152,7 +152,6 @@
             });
         });
 
-
         document.addEventListener('DOMContentLoaded', function() {
             const input = document.getElementById('post');
             const submitButton = document.getElementById('submit-button');

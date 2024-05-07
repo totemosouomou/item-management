@@ -15,8 +15,25 @@
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    <style>
+        .login-page, .register-page {
+            width: 170px;
+            height: 48px;
+            text-align: center;
+            padding: 5px 0;
+            color: #FFF;
+            background-color: #00abae;
+            border-radius: 25px;
+            border: 0;
+            outline: none;
+            font-size: 15px;
+        }
+        .register-page:hover {
+            background-color: #00abae;
+        }
+    </style>
 </head>
-<body>
+<body style="background: url(https://www.techis-learning.jp/images/back_login-min.png)">
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">

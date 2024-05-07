@@ -1,0 +1,107 @@
+.add-btn {
+  width: 115px;
+  height: 32px;
+  text-align: center;
+  padding: 5px 0;
+  color: #FFF;
+  background-color: #00abae;
+  border-radius: 25px;
+  border: 0;
+  outline: none;
+  font-size: 1em;
+}
+
+.add-btn:hover {
+  background-color: #00abae;
+}
+
+.nav-link.active {
+  background-color: #00ABAE !important;
+}
+
+.nav-item a {
+  text-decoration: none;
+  color: #f0f0f0;
+}
+
+.nav-item a button {
+  background-color: #00ABAE;
+  padding: 7px 30px;
+  margin: 0 1em;
+  border: none;
+}
+
+.nav-item a button:hover {
+  background-color: rgba(0, 171, 174, 0.8);
+  color: #fff;
+}
+
+.card-primary:not(.card-outline)>.card-header {
+  background-color: #fff;
+  color: #212529;
+}
+
+.card-primary:not(.card-outline)>.card-header .btn-tool {
+    color: #212529;
+}
+
+.card-primary:not(.card-outline)>.card-header .btn-tool:hover {
+  color: rgba(33, 37, 41, 0.8);
+}
+
+.curriculum-nav-item {
+  margin-right: 10px;
+}
+
+.curriculum-nav-item a {
+  color: #fff;
+}
+
+.curriculum-dropdown {
+  display: none;
+  list-style: none;
+  position: absolute;
+  background-color: #00abae;
+  padding: 10px;
+  border-radius: 5px;
+  left: 71px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+.alert-danger {
+  margin-bottom: -15px;
+}
+
+.main-footer {
+  text-align: center;
+  background-color: #00abae;
+  color: #fff;
+}
+
+/* 1200px以下の場合に表示 */
+@media (max-width: 1200px) {
+  .nav-item-responsive {
+      display: none;
+  }
+
+  .main-footer {
+      height: 70px;
+      font-size: 0.8em;
+  }
+
+  .main-footer p {
+      margin: 0 auto
+  }
+
+  .curriculum-nav-item:hover .curriculum-dropdown {
+    display: block;
+  }
+
+  .myChart-responsive {
+    width: 100% !important;
+  }
+
+  .iframely-embed-responsive {
+    display: none;
+  }
+}

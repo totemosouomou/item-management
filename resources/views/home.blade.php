@@ -7,24 +7,84 @@
 @stop
 
 @section('content')
-    <p>登録記事点数の多い順ランキング上位者</p>
-    <!-- resources/views/home.blade.php -->
-    <div class="mb-5">
-        <canvas id="myChart" height="100%"></canvas>
-    </div>
+    <div class="row">
+        <div class="col-12">
 
-    <p class="mt-5">各記事へ詳細情報を入力した　私は偉い！</p>
-    <ul class="posts ms-5 mt-1 mb-0 list-unstyled list-inline">
-        @foreach ($posts as $post)
-            <li class="list-inline-item" style="background-color: rgba(240, 240, 240, 0.6); border-radius: 100000px; padding: 1px 20px; font-size: 0.8em; color: rgba(0, 0, 0, 0.6);">
-                {{ $post->post }}
-            </li>
-        @endforeach
-    </ul>
+            @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if ($errors->any() || session('error'))
+                <div class="alert alert-danger">
+                    <ul>
+                        @if(session('error'))
+                            <li>{{ session('error') }}</li>
+                        @endif
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div class="card">
+                <div class="card-header">
+                    <p class="card-title" style="font-size: 1rem;">登録数ランキング上位者</p>
+                    <div class="card-tools">
+                        <button class="add-btn" style="font-weight: bold;" onclick="location.href='{{ url('items/add') }}';">
+                            記事登録
+                        </button>
+                    </div>
+                    <div class="d-flex justify-content-between" style="width: 100%;">
+                        <figure class="myChart-responsive" style="width: 70%;">
+                            <canvas id="myChart"></canvas>
+                        </figure>
+                        @if($randomItem)
+                            <div class="iframely-embed iframely-embed-responsive" style="position: relative; top: 10px; width: calc(30% - 10px);">
+                                <div class="iframely-responsive">
+                                    <a href="{{ $randomItem->url }}" data-iframely-url="//cdn.iframe.ly/api/iframe?url={{ $randomItem->url }}&media=0&api_key={{ config('iframely.api.key') }}"></a>
+                                </div>
+                                <div class="form-group" style="position: relative; top: 145px;">
+                                    <form method="POST" action="{{ url('items/update') }}">
+                                        @csrf
+                                        @php
+                                            $userPost = $randomItem->posts->where('user_id', auth()->id())->first();
+                                            $userPostComment = $userPost ? str_replace(" by " . Auth::user()->name, "", $userPost->post) : '';
+                                        @endphp
+                                        <input type="hidden" name="title" value="{{ $randomItem->title }}">
+                                        <input type="hidden" name="url" value="{{ $randomItem->url }}">
+                                        <input type="hidden" name="id" value="{{ $randomItem->id }}">
+                                        <input type="text" class="form-control" id="post" name="post" placeholder="{{ $userPost ? $userPostComment : 'コメントを投稿してみよう！' }}" value="{{ $userPost ? $userPostComment : '' }}">
+                                        <button id="submit-button" class="add-btn mt-2" style="display: none; font-weight: bold;">Submit</button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p>記事へコメントする私は偉い！</p>
+                    <ul class="posts mx-3 mt-1 mb-0 list-unstyled list-inline">
+                        @foreach ($posts as $post)
+                            <li class="list-inline-item mb-2" style="background-color: rgba(250, 250, 250, 0.5); border-radius: 10px; padding: 1px 20px; font-size: 0.8em; color: rgba(33, 37, 41, 0.8);">
+                                {{ $post->post }}
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+@stop
+
+@section('footer')
+    <p>勝ち抜きたいなら、まずは今すぐ一歩を踏み出そう。</p>
+    <a href="/"><img src="https://www.techis-learning.jp/img/common/logo_white.png" alt="ロゴ" width="110"></a>
 @stop
 
 @section('css')
-    {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
 @stop
 
 @section('js')
@@ -89,6 +149,34 @@
                         }
                     }
                 }
+            });
+        });
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('post');
+            const submitButton = document.getElementById('submit-button');
+
+            // input要素にフォーカスが当たったときのイベントリスナーを追加
+            input.addEventListener('focus', function() {
+                // submitボタンを表示する
+                submitButton.style.display = 'block';
+            });
+
+            // submitボタンにマウスが乗ったときのイベントリスナーを追加
+            submitButton.addEventListener('mouseenter', function() {
+                // input要素がフォーカスされているかどうかをチェック
+                if (!input.matches(':focus')) {
+                    // input要素がフォーカスされていない場合、submitボタンを非表示にする
+                    submitButton.style.display = 'none';
+                }
+            });
+
+            // submitボタンをクリックしたときのイベントリスナーを追加
+            submitButton.addEventListener('click', function() {
+                // ここにsubmitの処理を追加する（例えば、フォームの送信など）
+                // ここでは単純にsubmitがクリックされたことをログに出力する
+                console.log('Submit button clicked');
             });
         });
     </script>

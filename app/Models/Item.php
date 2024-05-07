@@ -15,7 +15,7 @@ class Item extends Model
     }
 
     /**
-     * このアイテムに関連する詳細を取得
+     * このアイテムに関連するコメントを取得
      */
     public function posts()
     {
@@ -29,8 +29,9 @@ class Item extends Model
      */
     protected $fillable = [
         'user_id',
-        'name',
+        'title',
         'url',
+        'stage',
     ];
 
     /**

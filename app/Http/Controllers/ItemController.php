@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\Traits\PeriodCalculator;
 use App\Models\User;
 use App\Models\Item;
 use App\Models\Post;
-use Carbon\Carbon;
 
 class ItemController extends Controller
 {
+    use PeriodCalculator;
+
     /**
      * Create a new controller instance.
      *
@@ -30,8 +33,8 @@ class ItemController extends Controller
     {
         return [
             'url' => 'required|url|starts_with:http,https',
-            'name' => 'required|string|max:100',
-            'post' => 'nullable|string|max:500',
+            'title' => 'required|string|max:100',
+            'post' => 'nullable|string|max:255',
         ];
     }
 
@@ -46,11 +49,11 @@ class ItemController extends Controller
             'url.required' => 'URLは必須項目です。',
             'url.url' => '有効なURLを入力してください。',
             'url.starts_with' => '有効なHTTPまたはHTTPSのURLを入力してください。',
-            'name.required' => '見出しは必須項目です。',
-            'name.string' => '見出しは文字列で入力してください。',
-            'name.max' => '見出しは100文字以内で入力してください。',
-            'post.string' => '詳細は文字列で入力してください。',
-            'post.max' => '詳細は500文字以内で入力してください。',
+            'title.required' => '見出しは必須項目です。',
+            'title.string' => '見出しは文字列で入力してください。',
+            'title.max' => '見出しは100文字以内で入力してください。',
+            'post.string' => 'コメントは文字列で入力してください。',
+            'post.max' => 'コメントは255文字以内で入力してください。',
         ];
     }
 
@@ -77,10 +80,10 @@ class ItemController extends Controller
         // 記事一覧取得
         if ($user_id) {
             $user_name = $user->name . "さんの記事";
-            $items = Item::with('posts')->where('user_id', $user_id)->get();
+            $items = Item::with('posts')->where('user_id', $user_id)->orderBy('created_at', 'desc')->get();
         } else {
             $user_name = "全記事";
-            $items = Item::with('posts')->get();
+            $items = Item::with('posts')->orderBy('created_at', 'desc')->get();
         }
 
     return view('item.index', compact('items', 'user_name'));
@@ -88,44 +91,26 @@ class ItemController extends Controller
     }
 
     /**
-     * 四半期中の記事一覧
+     * 記事一覧
      *
      * @return \Illuminate\Contracts\View\View
      */
-    public function quarterItems()
+    public function stageItems()
     {
-        $startOfQuarter = Carbon::now()->startOfQuarter();
-        $endOfQuarter = Carbon::now()->endOfQuarter();
-        $items = Item::with(['posts' => function ($query) use ($startOfQuarter, $endOfQuarter) {
-            $query->whereBetween('created_at', [$startOfQuarter, $endOfQuarter]);
-        }])->get();
-        $user_name = "四半期中の記事";
-        return view('item.index', compact('items', 'user_name'));
-    }
+        $stage = request()->route()->getName();
+        $userNames = [
+            'week' => '1週間以内の記事',
+            'month' => '45日以内の記事',
+            'quarter' => '120日以内の記事',
+            'term' => '180日以内の記事',
+        ];
 
-    /**
-     * 30日以内の記事一覧
-     *
-     * @return \Illuminate\Contracts\View\View
-     */
-    public function last30DaysItems()
-    {
-        $startOfLast30Days = Carbon::now()->subDays(30)->startOfDay();
-        $items = Item::with('posts')->where('created_at', '>=', $startOfLast30Days)->get();
-        $user_name = "30日以内の記事";
-        return view('item.index', compact('items', 'user_name'));
-    }
+        $items = Item::with('posts')
+            ->where('stage', $stage)
+            ->get();
 
-    /**
-     * 1週間以内の記事一覧
-     *
-     * @return \Illuminate\Contracts\View\View
-     */
-    public function lastWeekItems()
-    {
-        $startOfLastWeek = Carbon::now()->subWeek()->startOfWeek();
-        $items = Item::with('posts')->where('created_at', '>=', $startOfLastWeek)->get();
-        $user_name = "1週間以内の記事";
+        $user_name = $userNames[$stage] ?? '期間が未定義の記事';
+
         return view('item.index', compact('items', 'user_name'));
     }
 
@@ -137,6 +122,10 @@ class ItemController extends Controller
      */
     public function add(Request $request)
     {
+        // Trait内のメソッドを呼び出し、ユーザーの作成日から期間を取得する
+        $createdAt = Auth::user()->created_at;
+        $period = $this->getPeriodFromCreationDate($createdAt);
+
         // POSTリクエストのとき
         if ($request->isMethod('post')) {
 
@@ -146,23 +135,25 @@ class ItemController extends Controller
             // 記事登録
             $item = Item::create([
                 'user_id' => Auth::user()->id,
-                'name' => $request->name,
-                'url' => $request->url,
+                'title' => $request->input('title'),
+                'url' => $request->input('url'),
+                'stage' => $period,
             ]);
 
-            // 詳細登録
-            if ($request->post) {
+            // コメント登録
+            $post = $request->input('post');
+            if (!empty($post)) { // コメントが空でない場合のみ登録
                 Post::create([
                     'user_id' => Auth::id(),
                     'item_id' => $item->id,
-                    'post' => $request->post . " by " . Auth::user()->name,
+                    'post' => $post . " by " . Auth::user()->name,
                 ]);
             }
 
-            return redirect('/items');
+            return redirect("/items/{$period}")->with('success', '記事が登録されました。');
         }
 
-        return view('item.add');
+        return redirect("/items/{$period}")->with('add', '記事登録');
     }
 
     /**
@@ -176,38 +167,53 @@ class ItemController extends Controller
         // POSTリクエストのとき
         if ($request->isMethod('post')) {
 
-            // バリデーションを実行
-            $request->validate($this->validationRules(), $this->validationMessages());
+            // 更新前の記事とコメントを取得
+            $item = Item::findOrFail($request->id);
+            $postBeforeUpdate = Post::where('user_id', Auth::id())
+                ->where('item_id', $request->id)
+                ->first();
+            $postBeforeUpdateComment = $postBeforeUpdate ? str_replace(" by " . Auth::user()->name, "", $postBeforeUpdate->post) : '';
 
-            // 記事更新
-            Item::where('id', $request->id)->update([
-                'name' => $request->name,
-                'url' => $request->url,
-            ]);
+            // 記事とコメントの変更があるかどうかを判定
+            $itemChanged = $item->title !== $request->title || $item->url !== $request->url;
+            $postChanged = (!$postBeforeUpdate && $request->post) || ($postBeforeUpdate && $request->post !== $postBeforeUpdateComment);
 
-            // 詳細更新
-            $post = Post::where('user_id', Auth::id())
-                            ->where('item_id', $request->id)
-                            ->first();
-            if ($post) {
-                if ($request->post) {
-                    $post->update([
+            if ($itemChanged || $postChanged) {
+
+                // バリデーションを実行
+                $request->validate($this->validationRules(), $this->validationMessages());
+
+                // 記事更新
+                Item::where('id', $request->id)->update([
+                    'title' => $request->title,
+                    'url' => $request->url,
+                ]);
+
+                // コメント更新
+                if ($postBeforeUpdate) {
+                    if ($request->post) {
+                        $postBeforeUpdate->update([
+                            'post' => $request->post . " by " . Auth::user()->name,
+                        ]);
+                    } else {
+                        $postBeforeUpdate->delete();
+                    }
+                } elseif ($request->post) {
+                    Post::create([
+                        'user_id' => Auth::id(),
+                        'item_id' => $request->id,
                         'post' => $request->post . " by " . Auth::user()->name,
                     ]);
-                } else {
-                    $post->delete();
                 }
 
-            // 詳細が存在しない場合は新規作成
-            } elseif ($request->post) {
-                Post::create([
-                    'user_id' => Auth::id(),
-                    'item_id' => $request->id,
-                    'post' => $request->post . " by " . Auth::user()->name,
-                ]);
-            }
+                $period = $item->stage;
 
-            return redirect('/items')->with('success', '記事が更新されました。');
+                return redirect("/items/{$period}")->with('success', '記事が更新されました。');
+
+            // 変更がない場合はback
+            } else {
+                return back()->with('success', '記事の更新はありません。');
+            }
         }
 
         return view('item.index');
@@ -230,13 +236,13 @@ class ItemController extends Controller
             // 記事が存在するか確認
             if ($item) {
 
-                // 記事と関連する詳細を削除
+                // 記事と関連するコメントを削除
                 $item->posts()->delete();
                 $item->delete();
 
-                return redirect('/items')->with('success', '記事を削除しました');
+                return back()->with('success', '記事を削除しました');
             } else {
-                return redirect('/items')->with('error', '指定された記事が見つかりませんでした');
+                return back()->with('error', '指定された記事が見つかりませんでした');
             }
         }
 

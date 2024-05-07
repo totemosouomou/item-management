@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class UsersTableSeeder extends Seeder
 {
@@ -39,7 +40,14 @@ class UsersTableSeeder extends Seeder
         ];
 
         foreach ($users as $user) {
-            DB::table('users')->insert($user);
+            $createdAt = Carbon::now()->subDays(rand(0, 60));
+            DB::table('users')->insert([
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'password' => $user['password'],
+                'created_at' => $createdAt,
+                'updated_at' => $createdAt,
+            ]);
         }
     }
 }

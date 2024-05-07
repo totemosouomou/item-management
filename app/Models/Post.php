@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Post extends Model
 {
     /**
-     * 詳細情報を所有するユーザーを取得します。
+     * コメントを所有するユーザーを取得します。
      */
     public function user()
     {
@@ -15,7 +15,7 @@ class Post extends Model
     }
 
     /**
-     * 詳細情報を所有するアイテムを取得します。
+     * コメントを所有するアイテムを取得します。
      */
     public function item()
     {

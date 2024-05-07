@@ -79,15 +79,39 @@ class ItemsTableSeeder extends Seeder
         ];
 
         foreach ($articles as $article) {
-            $createdAt = Carbon::now()->subDays(rand(0, 60));
+            $createdAt = Carbon::now()->subDays(rand(0, 180));
 
             DB::table('items')->insert([
-                'user_id' => rand(1, 4), // ユーザーIDを1から4の範囲でランダムに設定
-                'name' => $article['title'],
+                'user_id' => rand(1, 4),
+                'title' => $article['title'],
                 'url' => $article['url'],
-                'created_at' => $createdAt, // 0〜60日前のランダムな日時を設定
-                'updated_at' => $createdAt, // created_atと同じ日時を設定
+                'stage' => $this->getStage($createdAt),
+                'created_at' => $createdAt,
+                'updated_at' => $createdAt,
             ]);
+        }
+    }
+
+    /**
+     * 作成日からステージを取得するメソッド
+     *
+     * @param \DateTimeInterface $createdAt
+     * @return string
+     */
+    private function getStage($createdAt): string
+    {
+        // 今からの日数を計算
+        $daysDiff = now()->diffInDays($createdAt);
+
+        // 日数に応じてステージを返す
+        if ($daysDiff <= 7) {
+            return 'week';
+        } elseif ($daysDiff <= 30) {
+            return 'month';
+        } elseif ($daysDiff <= 120) {
+            return 'quarter';
+        } else {
+            return 'term';
         }
     }
 }

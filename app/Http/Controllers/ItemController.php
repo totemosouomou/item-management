@@ -110,9 +110,9 @@ class ItemController extends Controller
         $stage = request()->route()->getName();
         $userNames = [
             'week' => '1週間以内の記事',
-            'month' => '45日以内の記事',
-            'quarter' => '120日以内の記事',
-            'term' => '180日以内の記事',
+            'month' => '基礎課題の記事',
+            'quarter' => '応用課題の記事',
+            'term' => '開発課題の記事',
         ];
 
         $items = Item::with('posts')

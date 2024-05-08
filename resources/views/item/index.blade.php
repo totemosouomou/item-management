@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', '一覧表示')
+@section('title', '記事管理：一覧表示')
 
 @section('content_header')
     <h1>一覧表示</h1>

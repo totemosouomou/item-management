@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Dashboard')
+@section('title', '記事管理：Dashboard')
 
 @section('content_header')
     <h1>Dashboard</h1>
@@ -182,7 +182,6 @@
 
             // submitボタンをクリックしたときのイベントリスナーを追加
             submitButton.addEventListener('click', function() {
-                // ここにsubmitの処理を追加する（例えば、フォームの送信など）
                 // ここでは単純にsubmitがクリックされたことをログに出力する
                 console.log('Submit button clicked');
             });

@@ -138,6 +138,23 @@
                                                 </li>
                                             @endforeach
                                         </ul>
+                                        @if (!$userPost)
+                                            <form method="POST" action="{{ url('items/update') }}">
+                                                @csrf
+                                                <div class="row mx-2 mt-2" id="userPost_{{ $item->id }}">
+                                                    <div class="col-sm-1">
+                                                        <label for="post" class="form-label-sm text-muted" style="position: relative; top: 5px;">Post</label>
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        <input type="hidden" name="title" value="{{ $item->title }}">
+                                                        <input type="hidden" name="url" value="{{ $item->url }}">
+                                                        <input type="hidden" name="id" value="{{ $item->id }}">
+                                                        <input type="text" class="form-control" id="post" name="post" placeholder="記事へコメントしましょう！">
+                                                        <button id="submit-button" class="add-btn mt-2" style="font-weight: bold;">Submit</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        @endif
 
                                         <div class="modal-body">
 
@@ -178,8 +195,8 @@
                                             <div class="d-flex" style="height: 2.4em;">
                                                 <div class="edit-form m-2 mr-4">
                                                         <input type="hidden" name="id" value="{{ $item->id }}">
-                                                        <p id="editBtn_{{ $item->id }}" class="btn btn-primary rounded-pill" onclick="editItem('{{ $item->id }}');" style="background-color: #00abae; border: 0; padding: 7px 30px;">編集</p>
-                                                        <button id="editSubmitBtn_{{ $item->id }}" class="btn btn-primary rounded-pill" style="display: none; background-color: #00abae; border: 0; padding: 7px 30px;">更新</button>
+                                                        <p id="editBtn_{{ $item->id }}" class="btn btn-outline-primary rounded-pill custom-button" onclick="editItem('{{ $item->id }}');" onmouseover="this.style.backgroundColor='#00abae'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#00abae';" style="border-color: #00abae; color: #00abae; padding: 7px 30px;">編集</p>
+                                                        <button id="editSubmitBtn_{{ $item->id }}" class="btn primary rounded-pill" style="display: none; background-color: #00abae; color: #fff; border: 0; padding: 7px 30px;">更新</button>
                                                     </form>
                                                 </div>
                                                 @if(auth()->id() == $item->user_id)
@@ -187,7 +204,7 @@
                                                         <form method="POST" action="{{ url('items/delete') }}">
                                                             @csrf
                                                             <input type="hidden" name="id" value="{{ $item->id }}">
-                                                            <button type="submit" class="btn btn-danger rounded-pill" style="padding: 7px 30px;">削除</button>
+                                                            <button type="submit" class="btn btn-outline-danger rounded-pill" style="padding: 7px 30px;">削除</button>
                                                         </form>
                                                     </div>
                                                 @endif
@@ -272,10 +289,14 @@
                 return;
             }
 
-        // テキストを元の表示状態に戻す
+            // テキストを元の表示状態に戻す
             document.getElementById('urlModalLabel' + itemId).style.display = 'block';
             document.getElementById('itemUrl_' + itemId).style.display = 'block';
             document.getElementById('itemPost_' + itemId).style.display = 'block';
+            var userPostElement = document.getElementById('userPost_' + itemId);
+            if (userPostElement) {
+                userPostElement.style.display = 'block';
+            }
 
             // 入力フィールドを非表示にする
             document.getElementById('editBox_' + itemId).style.display = 'none';
@@ -291,6 +312,10 @@
             var titleElement = document.getElementById('urlModalLabel' + itemId).style.display = 'none';
             var urlElement = document.getElementById('itemUrl_' + itemId).style.display = 'none';
             var postElement = document.getElementById('itemPost_' + itemId).style.display = 'none';
+            var userPostElement = document.getElementById('userPost_' + itemId);
+            if (userPostElement) {
+                userPostElement.style.display = 'none';
+            }
 
             // 入力フィールドを表示する
             document.getElementById('editBox_' + itemId).style.display = 'block';

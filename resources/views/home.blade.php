@@ -68,7 +68,17 @@
                     <p>記事へコメントする私は偉い！</p>
                     <ul class="posts mx-3 mt-1 mb-0 list-unstyled list-inline">
                         @foreach ($posts as $post)
-                            <li class="list-inline-item mb-2" style="background-color: rgba(250, 250, 250, 0.5); border-radius: 10px; padding: 1px 20px; font-size: 0.8em; color: rgba(33, 37, 41, 0.8);">
+                            <li class="list-inline-item mb-2" style="border-radius: 10px; padding: 1px 20px; font-size: 0.8em;
+                                @if ($post->user_id == auth()->user()->id)
+                                    color: #00abae;
+                                    background-color: #ddf2f3;
+                                    border-radius: 10px;
+                                @else
+                                    background-color: rgba(250, 250, 250, 0.5);
+                                    color: rgba(33, 37, 41, 0.8);
+                                    border-radius: 10px;
+                                @endif
+                            ">
                                 {{ $post->post }}
                             </li>
                         @endforeach

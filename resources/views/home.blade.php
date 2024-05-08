@@ -56,7 +56,7 @@
                                         <input type="hidden" name="title" value="{{ $randomItem->title }}">
                                         <input type="hidden" name="url" value="{{ $randomItem->url }}">
                                         <input type="hidden" name="id" value="{{ $randomItem->id }}">
-                                        <input type="text" class="form-control" id="post" name="post" placeholder="{{ $userPost ? $userPostComment : 'コメントを投稿してみよう！' }}" value="{{ $userPost ? $userPostComment : '' }}">
+                                        <input type="text" class="form-control" id="post" name="post" placeholder="{{ $userPost ? $userPostComment : '記事へコメントしましょう！' }}" value="{{ $userPost ? $userPostComment : '' }}">
                                         <button id="submit-button" class="add-btn mt-2" style="display: none; font-weight: bold;">Submit</button>
                                     </form>
                                 </div>
@@ -80,8 +80,7 @@
 @stop
 
 @section('footer')
-    <p>勝ち抜きたいなら、まずは今すぐ一歩を踏み出そう。</p>
-    <a href="/"><img src="https://www.techis-learning.jp/img/common/logo_white.png" alt="ロゴ" width="110"></a>
+    @include('vendor.adminlte.partials.footer')
 @stop
 
 @section('css')

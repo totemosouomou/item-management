@@ -201,9 +201,19 @@
                         @endforeach
                     </div>
                 </div>
+                {{-- ページネーション --}}
+                @if ($items->hasPages())
+                    <div class="card-footer clearfix pb-0">
+                        {{ $items->links() }}
+                    </div>
+                @endif
             </div>
         </div>
     </div>
+@stop
+
+@section('footer')
+    @include('vendor.adminlte.partials.footer')
 @stop
 
 @section('css')

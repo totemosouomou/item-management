@@ -72,6 +72,17 @@
   margin-bottom: -15px;
 }
 
+.page-item.active .page-link {
+  z-index: 3;
+  color: #00abae;
+  background-color: #ddf2f3;
+  border-color: #ddf2f3;
+}
+
+.page-link {
+  color: #00abae;
+}
+
 .main-footer {
   text-align: center;
   background-color: #00abae;

@@ -25,6 +25,16 @@ class ItemController extends Controller
     }
 
     /**
+     * ページネーションに使用する数字を返すメソッド
+     *
+     * @return int
+     */
+    private function pagination(): int
+    {
+        return 10;
+    }
+
+    /**
      * バリデーションルールの定義
      *
      * @return array
@@ -80,10 +90,10 @@ class ItemController extends Controller
         // 記事一覧取得
         if ($user_id) {
             $user_name = $user->name . "さんの記事";
-            $items = Item::with('posts')->where('user_id', $user_id)->orderBy('created_at', 'desc')->get();
+            $items = Item::with('posts')->where('user_id', $user_id)->orderBy('created_at', 'desc')->paginate($this->pagination());
         } else {
             $user_name = "全記事";
-            $items = Item::with('posts')->orderBy('created_at', 'desc')->get();
+            $items = Item::with('posts')->orderBy('created_at', 'desc')->paginate($this->pagination());
         }
 
     return view('item.index', compact('items', 'user_name'));
@@ -107,7 +117,7 @@ class ItemController extends Controller
 
         $items = Item::with('posts')
             ->where('stage', $stage)
-            ->get();
+            ->orderBy('created_at', 'desc')->paginate($this->pagination());
 
         $user_name = $userNames[$stage] ?? '期間が未定義の記事';
 

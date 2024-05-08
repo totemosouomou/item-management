@@ -29,8 +29,9 @@
             <div id="centerText" style="position: relative; top: -95px; left: 140px; transform: translate(-50%, -50%); font-size: 48px; font-weight: bold; color: #00abae;"></div>
             <p class="my-2" style="position: relative; top: -70px; text-align: center; font-size: 0.75em;">只今の進捗率</p>
             <p style="position: relative; top: -70px;font-size: 0.75em;">
-                基礎課題(30/31)　
-                応用課題(20/25)</p>
+                基礎課題(<?php $fundamental = 31; $fundamentalScore = mt_rand(15, $fundamental); echo $fundamentalScore; ?>/<?php echo $fundamental; ?>)　
+                応用課題(<?php $applied = 25; $appliedScore = $fundamentalScore < 20 ? 0 : mt_rand(0, $applied); echo $appliedScore; ?>/<?php echo $applied; ?>)
+
         </div>
     </div>
 
@@ -39,7 +40,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const ctx = document.getElementById('myChartPie').getContext('2d');
-        const finaldata = [89, 11];
+        const finaldata = [<?php $progress_rate = ($fundamentalScore + $appliedScore) / ($fundamental + $applied) * 100; echo $progress_rate; ?>, <?php echo 100 - $progress_rate; ?>];
         const total = finaldata.reduce((acc, val) => acc + val, 0);
 
         const myChart = new Chart(ctx, {

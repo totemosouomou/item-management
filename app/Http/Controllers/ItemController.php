@@ -83,7 +83,7 @@ class ItemController extends Controller
         if ($user_id) {
             $user = User::find($user_id);
             if (!$user) {
-                return redirect('/items')->with('error', '指定されたユーザーが見つかりませんでした');
+                return redirect('/items')->with('error', '指定されたユーザーが見つかりませんでした。');
             }
         }
 
@@ -211,9 +211,7 @@ class ItemController extends Controller
                     ]);
                 }
 
-                $period = $item->stage;
-
-                return redirect("/items/{$period}")->with('success', '記事が更新されました。');
+                return back()->with('success', '記事が更新されました。');
 
             // 変更がない場合はback
             } else {
@@ -221,7 +219,7 @@ class ItemController extends Controller
             }
         }
 
-        return redirect('/items')->with('error', '指定された記事が見つかりませんでした');
+        return redirect('/items')->with('error', '指定された記事が見つかりませんでした。');
     }
 
     /**
@@ -245,12 +243,12 @@ class ItemController extends Controller
                 $item->posts()->delete();
                 $item->delete();
 
-                return back()->with('success', '記事を削除しました');
+                return back()->with('success', '記事を削除しました。');
             } else {
-                return back()->with('error', '指定された記事が見つかりませんでした');
+                return back()->with('error', '指定された記事が見つかりませんでした。');
             }
         }
 
-        return redirect('/items')->with('error', '指定された記事が見つかりませんでした');
+        return redirect('/items')->with('error', '指定された記事が見つかりませんでした。');
     }
 }

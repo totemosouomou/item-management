@@ -25,12 +25,12 @@ Route::prefix('items')->group(function () {
     // 記事一覧を表示するルート
     Route::get('/', [App\Http\Controllers\ItemController::class, 'index']);
     // 特定のユーザーに関連付けられた記事一覧を表示するルート
-    Route::get('/user/{user_id}', [App\Http\Controllers\ItemController::class, 'index'])->name('index.user');
+    Route::get('/user/{user_id}', [App\Http\Controllers\ItemController::class, 'index'])->name('user');
     // 期間に応じた記事一覧を表示するルート
-    Route::get('/term', [App\Http\Controllers\ItemController::class, 'stageItems'])->name('term');
-    Route::get('/quarter', [App\Http\Controllers\ItemController::class, 'stageItems'])->name('quarter');
-    Route::get('/month', [App\Http\Controllers\ItemController::class, 'stageItems'])->name('month');
-    Route::get('/week', [App\Http\Controllers\ItemController::class, 'stageItems'])->name('week');
+    Route::get('/term', [App\Http\Controllers\ItemController::class, 'index'])->name('term');
+    Route::get('/quarter', [App\Http\Controllers\ItemController::class, 'index'])->name('quarter');
+    Route::get('/month', [App\Http\Controllers\ItemController::class, 'index'])->name('month');
+    Route::get('/week', [App\Http\Controllers\ItemController::class, 'index'])->name('week');
 
     Route::get('/add', [App\Http\Controllers\ItemController::class, 'add']);
     Route::post('/add', [App\Http\Controllers\ItemController::class, 'add']);

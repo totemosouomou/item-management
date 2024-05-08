@@ -31,7 +31,7 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">{{ $user_name }}を表示</h3>
+                    <h3 class="card-title">{{ $title_name }}を表示</h3>
                     <div class="card-tools">
                         <button class="add-btn" style="font-weight: bold;" data-toggle="modal" data-target="#urlModalAdd">
                             記事登録
@@ -83,7 +83,13 @@
                                         <!-- 投稿ボタン -->
                                         <div class="d-flex" style="height: 2.4em;">
                                             <div class="edit-form m-2 mr-4">
-                                                    <button class="btn btn-primary rounded-pill" style="background-color: #00abae; border: 0; padding: 7px 30px;">投稿</button>
+                                                @if (isset($titleNames[$stage]) && $stage !== $period)
+                                                    <button type="submit" class="btn btn-primary rounded-pill" style="background-color: #00abae; border: 0; padding: 7px 30px;" onclick="setPeriodValue('{{ $stage }}')">{{ $titleNames[$stage] }}へ投稿</button>
+                                                    <button type="submit" class="btn btn-outline-primary rounded-pill custom-button ml-2" onmouseover="this.style.backgroundColor='#00abae'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#00abae';" style="border-color: #00abae; color: #00abae; padding: 7px 30px;" onclick="setPeriodValue('{{ $period }}')">{{ $titleNames[$period] }}へ投稿</button>
+                                                    <input type="hidden" name="period" id="periodValue">
+                                                @else
+                                                    <button type="submit" class="btn btn-primary rounded-pill" style="background-color: #00abae; border: 0; padding: 7px 30px;">投稿</button>
+                                                @endif
                                                 </form>
                                             </div>
                                         </div>
@@ -139,9 +145,9 @@
                                             @endforeach
                                         </ul>
                                         @if (!$userPost)
-                                            <form method="POST" action="{{ url('items/update') }}">
+                                            <form method="POST" action="{{ url('items/update') }}" id="userPost_{{ $item->id }}">
                                                 @csrf
-                                                <div class="row mx-2 mt-2" id="userPost_{{ $item->id }}">
+                                                <div class="row mx-2 mt-2">
                                                     <div class="col-sm-1">
                                                         <label for="post" class="form-label-sm text-muted" style="position: relative; top: 5px;">Post</label>
                                                     </div>
@@ -150,7 +156,7 @@
                                                         <input type="hidden" name="url" value="{{ $item->url }}">
                                                         <input type="hidden" name="id" value="{{ $item->id }}">
                                                         <input type="text" class="form-control" id="post" name="post" placeholder="記事へコメントしましょう！">
-                                                        <button id="submit-button" class="add-btn mt-2" style="font-weight: bold;">Submit</button>
+                                                        <button type="submit" id="submit-button" class="add-btn mt-2" style="font-weight: bold;">Submit</button>
                                                     </div>
                                                 </div>
                                             </form>
@@ -196,7 +202,7 @@
                                                 <div class="edit-form m-2 mr-4">
                                                         <input type="hidden" name="id" value="{{ $item->id }}">
                                                         <p id="editBtn_{{ $item->id }}" class="btn btn-outline-primary rounded-pill custom-button" onclick="editItem('{{ $item->id }}');" onmouseover="this.style.backgroundColor='#00abae'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#00abae';" style="border-color: #00abae; color: #00abae; padding: 7px 30px;">編集</p>
-                                                        <button id="editSubmitBtn_{{ $item->id }}" class="btn primary rounded-pill" style="display: none; background-color: #00abae; color: #fff; border: 0; padding: 7px 30px;">更新</button>
+                                                        <button type="submit" id="editSubmitBtn_{{ $item->id }}" class="btn btn-primary rounded-pill" style="display: none; background-color: #00abae; color: #fff; border: 0; padding: 7px 30px;">更新</button>
                                                     </form>
                                                 </div>
                                                 @if(auth()->id() == $item->user_id)
@@ -279,6 +285,10 @@
                 $('#urlModalAdd').modal('show');
             });
         @endif
+
+        function setPeriodValue(period) {
+            document.getElementById('periodValue').value = period;
+        }
 
         // モーダルが閉じたときのイベントを検知するためのスクリプト
         $('.modal').on('hidden.bs.modal', function (e) {

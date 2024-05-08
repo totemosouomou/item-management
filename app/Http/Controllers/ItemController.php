@@ -76,7 +76,7 @@ class ItemController extends Controller
     public function index($user_id = null)
     {
         if ($user_id == "admin") {
-            return redirect()->route('index.user', ['user_id' => auth()->id()]);
+            return redirect()->route('user', ['user_id' => auth()->id()]);
         }
 
         // バリデーション: ユーザーIDが指定されている場合は存在するかチェックする
@@ -87,41 +87,31 @@ class ItemController extends Controller
             }
         }
 
-        // 記事一覧取得
-        if ($user_id) {
-            $user_name = $user->name . "さんの記事";
-            $items = Item::with('posts')->where('user_id', $user_id)->orderBy('created_at', 'desc')->paginate($this->pagination());
-        } else {
-            $user_name = "全記事";
-            $items = Item::with('posts')->orderBy('created_at', 'desc')->paginate($this->pagination());
-        }
-
-    return view('item.index', compact('items', 'user_name'));
-
-    }
-
-    /**
-     * 記事一覧
-     *
-     * @return \Illuminate\Contracts\View\View
-     */
-    public function stageItems()
-    {
         $stage = request()->route()->getName();
-        $userNames = [
+        $titleNames = [
             'week' => '1週間以内の記事',
             'month' => '基礎課題の記事',
             'quarter' => '応用課題の記事',
             'term' => '開発課題の記事',
         ];
 
-        $items = Item::with('posts')
-            ->where('stage', $stage)
-            ->orderBy('created_at', 'desc')->paginate($this->pagination());
+        // $titleNames 内に指定されたステージが存在するかチェックし、存在しない場合はデフォルトのタイトルを設定
+        $title_name = isset($titleNames[$stage]) ? $titleNames[$stage] : "全記事";
 
-        $user_name = $userNames[$stage] ?? '期間が未定義の記事';
+        if ($user_id) {
+            $title_name = $user->name . "さんの記事";
+            $items = Item::with('posts')->where('user_id', $user_id)->orderBy('created_at', 'desc')->paginate($this->pagination());
+        } elseif ($title_name !== '全記事') {
+            $items = Item::with('posts')->where('stage', $stage)->orderBy('created_at', 'desc')->paginate($this->pagination());
+        } else {
+            $items = Item::with('posts')->orderBy('created_at', 'desc')->paginate($this->pagination());
+        }
 
-        return view('item.index', compact('items', 'user_name'));
+        // Trait内のメソッドを呼び出し、ユーザーの作成日から期間を取得する
+        $createdAt = Auth::user()->created_at;
+        $period = $this->getPeriodFromCreationDate($createdAt);
+
+        return view('item.index', compact('stage', 'titleNames', 'items', 'title_name', 'period'));
     }
 
     /**
@@ -141,6 +131,11 @@ class ItemController extends Controller
 
             // バリデーションを実行
             $request->validate($this->validationRules(), $this->validationMessages());
+
+            // リクエストの値を period に再代入する
+            if ($request->has('period')) {
+                $period = $request->input('period');
+            }
 
             // 記事登録
             $item = Item::create([

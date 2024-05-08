@@ -30,7 +30,7 @@ return [
     |
     */
 
-    'use_ico_only' => false,
+    'use_ico_only' => true,
     'use_full_favicon' => false,
 
     /*
@@ -297,14 +297,9 @@ return [
         ],
         ['header' => '記事'],
         [
-            'text'       => '開発課題',
+            'text'       => '最初に見たい記事',
             'icon_color' => 'cyan',
-            'url'        => 'items/term',
-        ],
-        [
-            'text'       => '応用課題',
-            'icon_color' => 'cyan',
-            'url'        => 'items/quarter',
+            'url'        => 'items/week',
         ],
         [
             'text'       => '基礎課題',
@@ -312,9 +307,14 @@ return [
             'url'        => 'items/month',
         ],
         [
-            'text'       => '最初に見たい記事',
+            'text'       => '応用課題',
             'icon_color' => 'cyan',
-            'url'        => 'items/week',
+            'url'        => 'items/quarter',
+        ],
+        [
+            'text'       => '開発課題',
+            'icon_color' => 'cyan',
+            'url'        => 'items/term',
         ],
         ['header' => 'アカウント'],
         [

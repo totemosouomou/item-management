@@ -221,7 +221,7 @@ class ItemController extends Controller
             }
         }
 
-        return view('item.index');
+        return redirect('/items')->with('error', '指定された記事が見つかりませんでした');
     }
 
     /**

@@ -1,3 +1,35 @@
+.btn-size {
+  padding: 7px 30px;
+}
+
+.submit-btn {
+  background-color: #00abae;
+  color: #fff;
+  border: 0;
+}
+
+.submit-btn:hover {
+  background-color: rgba(0, 171, 174, 0.8);
+  color: #fff;
+}
+
+.submit-btn:active {
+  background-color: #00abae;
+  color: #fff;
+  border: 0;
+}
+
+.mirror-btn {
+  color: #00abae;
+  border: 1px solid #00abae;
+}
+
+.mirror-btn:hover {
+  background-color: #00abae;
+  color: #fff;
+  border: 1px solid #00abae;
+}
+
 .add-btn {
   width: 115px;
   height: 32px;
@@ -12,7 +44,8 @@
 }
 
 .add-btn:hover {
-  background-color: #00abae;
+  background-color: rgba(0, 171, 174, 0.8);
+  color: #fff;
 }
 
 .nav-link.active {
@@ -57,6 +90,14 @@
   color: #fff;
 }
 
+.curriculum-nav-item .nav-link::after {
+  content: '';
+  position: absolute;
+  left: 17px;
+  bottom: 0;
+  width: 82%;
+  border-bottom: 2px solid #00abae;}
+
 .curriculum-dropdown {
   display: none;
   list-style: none;
@@ -70,6 +111,40 @@
 
 .alert-danger {
   margin-bottom: -15px;
+}
+
+.urls, .posts {
+  margin-left: 16px;
+}
+
+.contents {
+  position: relative;
+  padding-left: 10px;
+}
+
+.contents::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 3px;
+  height: 20px;
+  background-color: rgba(0, 171, 174, 0.8);
+}
+
+.contents::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 20px;
+  height: 3px;
+  background-color: rgba(0, 171, 174, 0.8);
+}
+
+.modal-dialog {
+  max-width: 800px;
+  max-height: 400px;
 }
 
 .page-item.active .page-link {

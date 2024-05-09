@@ -60,43 +60,43 @@
                                             @csrf
                                             <div class="row">
                                                 <div class="col-sm-1">
-                                                    <label for="title" class="form-label-sm text-muted" style="position: relative; top: -5px;">Title</label>
+                                                    <label for="title" class="form-label-sm text-muted" style="position: relative; top: 6px; left: 10px;">Title</label>
                                                 </div>
                                                 <div class="col-sm-11">
-                                                    <input type="text" class="form-control mb-2" style="position: relative; top: -10px;" name="title" placeholder="記事のタイトルなど、わかりやすい見出しにしましょう">
+                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 0px;" id="title" name="title" placeholder="記事のタイトルなど、わかりやすい見出しにしましょう">
                                                 </div>
                                                 <div class="col-sm-1">
-                                                    <label for="url" class="form-label-sm text-muted" style="position: relative; top: -5px;">URL</label>
+                                                    <label for="url" class="form-label-sm text-muted" style="position: relative; top: 11px; left: 10px;">URL</label>
                                                 </div>
                                                 <div class="col-sm-11">
-                                                    <input type="text" class="form-control mb-2" style="position: relative; top: -10px;" name="url" placeholder="リンク先となる記事のURLを入力しましょう">
+                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 4px;" id="url" name="url" placeholder="リンク先となる記事のURLを入力しましょう">
                                                 </div>
                                                 <div class="col-sm-1">
-                                                    <label for="post" class="form-label-sm text-muted" style="position: relative; top: 5px;">Post</label>
+                                                    <label for="post" class="form-label-sm text-muted" style="position: relative; top: 15px; left: 8px;">Post</label>
                                                 </div>
                                                 <div class="col-sm-11">
-                                                    <input type="text" class="form-control mb-2" name="post"  placeholder="コメントを入力できます">
+                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 8px;" id="post" name="post" placeholder="コメントを入力できます">
                                                 </div>
                                             </div>
                                         </div>
 
                                         <!-- 投稿ボタン -->
-                                        <div class="d-flex" style="height: 2.4em;">
+                                        <div class="d-flex">
                                             <div class="edit-form m-2 mr-4">
                                                 @if (isset($titleNames[$stage]) && $stage !== $period)
-                                                    <button type="submit" class="btn btn-primary rounded-pill" style="background-color: #00abae; border: 0; padding: 7px 30px;" onclick="setPeriodValue('{{ $stage }}')">{{ $titleNames[$stage] }}へ投稿</button>
-                                                    <button type="submit" class="btn btn-outline-primary rounded-pill custom-button ml-2" onmouseover="this.style.backgroundColor='#00abae'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#00abae';" style="border-color: #00abae; color: #00abae; padding: 7px 30px;" onclick="setPeriodValue('{{ $period }}')">{{ $titleNames[$period] }}へ投稿</button>
+                                                    <button type="submit" class="btn rounded-pill btn-size submit-btn ml-5" onclick="setPeriodValue('{{ $stage }}')">{{ $titleNames[$stage] }}へ投稿</button>
+                                                    <button type="submit" class="btn rounded-pill btn-size mirror-btn ml-2" onclick="setPeriodValue('{{ $period }}')">{{ $titleNames[$period] }}へ投稿</button>
                                                     <input type="hidden" name="period" id="periodValue">
                                                 @else
-                                                    <button type="submit" class="btn btn-primary rounded-pill" style="background-color: #00abae; border: 0; padding: 7px 30px;">投稿</button>
+                                                    <button type="submit" class="btn rounded-pill btn-size submit-btn ml-5">投稿</button>
                                                 @endif
                                                 </form>
                                             </div>
                                         </div>
 
                                         <!-- ブログカード表示 -->
-                                        <div class="iframely-embed mt-4">
-                                            <div class="iframely-responsive" style="height: 170px; padding-bottom: 0;">
+                                        <div class="iframely-embed mt-2">
+                                            <div>
                                                 <a href="https://youtu.be/kyRMuV8oJVY?si=dilNpM_bdLjLEKMe" data-iframely-url="//cdn.iframe.ly/api/iframe?url=https://youtu.be/kyRMuV8oJVY?si=dilNpM_bdLjLEKMe&autoplay=0&api_key={{ config('iframely.api.key') }}"></a>
                                             </div>
                                         </div>
@@ -149,14 +149,14 @@
                                                 @csrf
                                                 <div class="row mx-2 mt-2">
                                                     <div class="col-sm-1">
-                                                        <label for="post" class="form-label-sm text-muted" style="position: relative; top: 5px;">Post</label>
+                                                        <label for="post" class="form-label-sm text-muted" style="position: relative; top: 6px; left: 8px;">Post</label>
                                                     </div>
                                                     <div class="col-sm-11">
+                                                        <input type="text" class="form-control" id="post" name="post" placeholder="記事へコメントしましょう！">
                                                         <input type="hidden" name="title" value="{{ $item->title }}">
                                                         <input type="hidden" name="url" value="{{ $item->url }}">
                                                         <input type="hidden" name="id" value="{{ $item->id }}">
-                                                        <input type="text" class="form-control" id="post" name="post" placeholder="記事へコメントしましょう！">
-                                                        <button type="submit" id="submit-button" class="add-btn mt-2" style="font-weight: bold;">Submit</button>
+                                                        <button type="submit" id="submit-button" class="btn rounded-pill btn-size submit-btn mt-2">コメント送信</button>
                                                     </div>
                                                 </div>
                                             </form>
@@ -170,47 +170,56 @@
                                                 @csrf
                                                 <div class="row">
                                                     <div class="col-sm-1">
-                                                        <label for="title" class="form-label-sm text-muted" style="position: relative; top: -5px;">Title</label>
+                                                        <label for="title" class="form-label-sm text-muted" style="position: relative; top: 6px; left: 10px;">Title</label>
                                                     </div>
                                                     <div class="col-sm-11">
-                                                        <input type="text" class="form-control mb-2" style="position: relative; top: -10px;" name="title" placeholder="記事のタイトルなど、わかりやすい見出しにしましょう" value="{{ $item->title }}">
+                                                        <input type="text" class="form-control mb-2" style="position: relative; top: 0px;" id="title" name="title" placeholder="記事のタイトルなど、わかりやすい見出しにしましょう" value="{{ $item->title }}">
                                                     </div>
                                                     <div class="col-sm-1">
-                                                        <label for="url" class="form-label-sm text-muted" style="position: relative; top: -5px;">URL</label>
+                                                        <label for="url" class="form-label-sm text-muted" style="position: relative; top: 11px; left: 10px;">URL</label>
                                                     </div>
                                                     <div class="col-sm-11">
-                                                        <input type="text" class="form-control mb-2" style="position: relative; top: -10px;" name="url" placeholder="リンク先となる記事のURLを入力しましょう" value="{{ $item->url }}">
+                                                        <input type="text" class="form-control mb-2" style="position: relative; top: 4px;" id="url" name="url" placeholder="リンク先となる記事のURLを入力しましょう" value="{{ $item->url }}">
                                                     </div>
                                                     <div class="col-sm-1">
-                                                        <label for="post" class="form-label-sm text-muted" style="position: relative; top: 5px;">Post</label>
+                                                        <label for="post" class="form-label-sm text-muted" style="position: relative; top: 15px; left: 8px;">Post</label>
                                                     </div>
                                                     <div class="col-sm-11">
-                                                        <input type="text" class="form-control mb-2" name="post"  placeholder="{{ $userPost ? $userPost : 'コメントを入力できます' }}" value="{{ $userPost }}">
+                                                        <input type="text" class="form-control mb-2" style="position: relative; top: 8px;" id="post" name="post" placeholder="{{ $userPost ? $userPost : 'コメントを入力できます' }}" value="{{ $userPost }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- 編集用ボタンボックス -->
+                                            <div id="editSubmitBox_{{ $item->id }}" style="display: none;">
+                                                <div class="d-flex">
+                                                    <div class="edit-form">
+                                                        <input type="hidden" name="id" value="{{ $item->id }}">
+                                                        <button type="submit" class="btn rounded-pill btn-size submit-btn" style="margin: 9px 15px 16px 56px;">更新して投稿</button>
+                                                        </form>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <!-- ブログカード表示 -->
                                             <div class="iframely-embed">
-                                                <div class="iframely-responsive" style="height: 170px; padding-bottom: 0;">
+                                                <div>
                                                     <a href="{{ $item->url }}" data-iframely-url="//cdn.iframe.ly/api/iframe?url={{ $item->url }}&media=0&api_key={{ config('iframely.api.key') }}"></a>
                                                 </div>
                                             </div>
 
                                             <!-- 編集・削除ボタン -->
-                                            <div class="d-flex" style="height: 2.4em;">
-                                                <div class="edit-form m-2 mr-4">
-                                                        <input type="hidden" name="id" value="{{ $item->id }}">
-                                                        <p id="editBtn_{{ $item->id }}" class="btn btn-outline-primary rounded-pill custom-button" onclick="editItem('{{ $item->id }}');" onmouseover="this.style.backgroundColor='#00abae'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#00abae';" style="border-color: #00abae; color: #00abae; padding: 7px 30px;">編集</p>
-                                                        <button type="submit" id="editSubmitBtn_{{ $item->id }}" class="btn btn-primary rounded-pill" style="display: none; background-color: #00abae; color: #fff; border: 0; padding: 7px 30px;">更新</button>
-                                                    </form>
+                                            <div class="d-flex">
+                                                <div id="editBtn_{{ $item->id }}" class="edit-form m-2 mr-4" style="height: 2.4em;">
+                                                    <p class="btn rounded-pill btn-size mirror-btn" onclick="editItem('{{ $item->id }}');">編集</p>
                                                 </div>
                                                 @if(auth()->id() == $item->user_id)
-                                                    <div class="delete-form m-2 ml-4">
-                                                        <form method="POST" action="{{ url('items/delete') }}">
+                                                    <div id="deleteBtn_{{ $item->id }}" class="d-flex delete-form m-2 ml-4" style="height: 2.4em;">
+                                                        <form method="POST" action="{{ url('items/delete') }}" id="delete-form_{{ $item->id }}">
                                                             @csrf
                                                             <input type="hidden" name="id" value="{{ $item->id }}">
-                                                            <button type="submit" class="btn btn-outline-danger rounded-pill" style="padding: 7px 30px;">削除</button>
+                                                            <p id="delete-btn_{{ $item->id }}" class="btn btn-outline-danger rounded-pill btn-size delete-btn" onclick="deleteItem('{{ $item->id }}');">削除</p>
+                                                            <button id="delete-Submit_{{ $item->id }}" class="btn btn-danger rounded-pill btn-size" style="display: none; position: relative; left: 100px;">削除を実行するボタン</button>
                                                         </form>
                                                     </div>
                                                 @endif
@@ -240,41 +249,6 @@
 @stop
 
 @section('css')
-    <style>
-        .urls, .posts {
-            margin-left: 16px;
-        }
-
-        .contents {
-            position: relative;
-            padding-left: 10px;
-        }
-
-        .contents::before {
-            content: '';
-            position: absolute;
-            top: -5px;
-            left: 0;
-            width: 3px;
-            height: 20px;
-            background-color: rgba(0, 171, 174, 0.8);
-        }
-
-        .contents::after {
-            content: '';
-            position: absolute;
-            top: -5px;
-            left: 0;
-            width: 20px;
-            height: 3px;
-            background-color: rgba(0, 171, 174, 0.8);
-        }
-
-        .modal-dialog {
-            max-width: 800px;
-            max-height: 400px;
-        }
-    </style>
 @stop
 
 @section('js')
@@ -312,8 +286,18 @@
             document.getElementById('editBox_' + itemId).style.display = 'none';
 
             // 編集ボタンを元に戻す
+            document.getElementById('editSubmitBox_' + itemId).style.display = 'none';
             document.getElementById('editBtn_' + itemId).style.display = 'block';
-            document.getElementById('editSubmitBtn_' + itemId).style.display = 'none';
+
+            // 削除ボタンを元に戻す（存在する場合）
+            var deleteBtnAria = document.getElementById('deleteBtn_' + itemId);
+            var deleteBtn = document.getElementById('delete-btn_' + itemId);
+            var deleteSubmitBtn = document.getElementById('delete-Submit_' + itemId);
+            if (deleteBtnAria) {
+                deleteBtnAria.style.display = 'block';
+                deleteBtn.style.display = 'block';
+                deleteSubmitBtn.style.display = 'none';
+            }
         });
 
         // 編集ボタンがクリックされたときの処理
@@ -330,9 +314,42 @@
             // 入力フィールドを表示する
             document.getElementById('editBox_' + itemId).style.display = 'block';
 
-            // 編集ボタンを更新ボタンにする
-            document.getElementById('editBtn_' + itemId).style.display = 'none';
-            document.getElementById('editSubmitBtn_' + itemId).style.display = 'block';
+            // 編集ボタンを有効にする
+            document.getElementById('editSubmitBox_' + itemId).style.display = 'block';
+
+            // editBtn を非表示にする
+            var editBtn = document.getElementById('editBtn_' + itemId);
+            editBtn.style.display = 'none';
+
+            // deleteBtn を非表示にする（存在する場合）
+            var deleteBtnAria = document.getElementById('deleteBtn_' + itemId);
+            var deleteBtn = document.getElementById('delete-btn_' + itemId);
+            if (deleteBtnAria) {
+                deleteBtnAria.style.display = 'none';
+                deleteBtn.style.display = 'none';
+            }
         }
+
+        // 削除ボタンがクリックされたときの処理
+        function deleteItem(itemId) {
+            var deleteBtn = document.getElementById('delete-btn_' + itemId);
+            var deleteSubmitBtn = document.getElementById('delete-Submit_' + itemId);
+
+            // アニメーションのスタート
+            var animation = deleteBtn.animate([
+                { transform: 'translateX(0)' },
+                { transform: 'translateX(100px)' }
+            ], {
+                duration: 500, // アニメーションの時間（ミリ秒）
+                easing: 'ease', // アニメーションのイージング
+            });
+
+            // 削除実行ボタンを有効にする
+            animation.onfinish = function() {
+                deleteBtn.style.display = 'none';
+                deleteSubmitBtn.style.display = 'block';
+            };
+        }
+
     </script>
 @stop

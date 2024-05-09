@@ -63,7 +63,7 @@
 
                         <div class="row mb-0">
                             <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary register-page">
+                                <button type="submit" class="btn btn-primary register-page" onmouseover="this.style.backgroundColor='#00abae'; this.style.color='#fff';">
                                     {{ __('Register') }}
                                 </button>
                             </div>

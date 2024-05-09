@@ -344,13 +344,26 @@
             var deleteSubmitBtn = document.getElementById('delete-Submit_' + itemId);
 
             // アニメーションのスタート
-            var animation = deleteBtn.animate([
-                { transform: 'translateX(0)' },
-                { transform: 'translateX(75px)' }
-            ], {
-                duration: 500, // アニメーションの時間（ミリ秒）
-                easing: 'ease', // アニメーションのイージング
-            });
+            var animation;
+
+            if (window.innerWidth <= 600) {
+                animation = deleteBtn.animate([
+                    { transform: 'translateX(0)' },
+                    { transform: 'translateX(30px)' }
+                ], {
+                    duration: 500, // アニメーションの時間（ミリ秒）
+                    easing: 'ease', // アニメーションのイージング
+                });
+                deleteSubmitBtn.style.left = '30px';
+            } else {
+                animation = deleteBtn.animate([
+                    { transform: 'translateX(0)' },
+                    { transform: 'translateX(75px)' }
+                ], {
+                    duration: 500, // アニメーションの時間（ミリ秒）
+                    easing: 'ease', // アニメーションのイージング
+                });
+            }
 
             // 削除実行ボタンを有効にする
             animation.onfinish = function() {
@@ -358,6 +371,5 @@
                 deleteSubmitBtn.style.display = 'block';
             };
         }
-
     </script>
 @stop

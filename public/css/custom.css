@@ -170,6 +170,14 @@
       display: none;
   }
 
+  .col-sm-1 {
+    width: 55px;
+  }
+
+  .col-sm-11 {
+    width: calc(100% - 55px);
+  }
+
   .main-footer {
       height: 70px;
       font-size: 0.8em;

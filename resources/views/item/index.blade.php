@@ -332,9 +332,12 @@
             // deleteBtn を非表示にする（存在する場合）
             var deleteBtnAria = document.getElementById('deleteBtn_' + itemId);
             var deleteBtn = document.getElementById('delete-btn_' + itemId);
+            var deleteSubmitBtn = document.getElementById('delete-Submit_' + itemId);
             if (deleteBtnAria) {
                 deleteBtnAria.style.display = 'none';
                 deleteBtn.style.display = 'none';
+                deleteSubmitBtn.style.display = 'none';
+
             }
         }
 

@@ -67,5 +67,8 @@
 
         const centerText = document.getElementById('centerText');
         centerText.innerText = `${Math.round((finaldata[0] / total) * 100)}%`;
+        if (centerText.innerText === '100%') {
+            centerText.style.left = '127px';
+        }
     });
 </script>

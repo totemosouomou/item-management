@@ -44,7 +44,7 @@ class ItemController extends Controller
         return [
             'url' => 'required|url|starts_with:http,https',
             'title' => 'required|string|max:100',
-            'post' => 'nullable|string|max:255',
+            'post' => 'nullable|string|max:200',
         ];
     }
 

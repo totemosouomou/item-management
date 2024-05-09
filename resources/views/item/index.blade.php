@@ -219,7 +219,7 @@
                                                             @csrf
                                                             <input type="hidden" name="id" value="{{ $item->id }}">
                                                             <p id="delete-btn_{{ $item->id }}" class="btn btn-outline-danger rounded-pill btn-size delete-btn" onclick="deleteItem('{{ $item->id }}');">削除</p>
-                                                            <button id="delete-Submit_{{ $item->id }}" class="btn btn-danger rounded-pill btn-size" style="display: none; position: relative; left: 100px;">削除を実行するボタン</button>
+                                                            <button id="delete-Submit_{{ $item->id }}" class="btn btn-danger rounded-pill btn-size" style="display: none; position: relative; left: 75px;">削除を実行するボタン</button>
                                                         </form>
                                                     </div>
                                                 @endif
@@ -346,7 +346,7 @@
             // アニメーションのスタート
             var animation = deleteBtn.animate([
                 { transform: 'translateX(0)' },
-                { transform: 'translateX(100px)' }
+                { transform: 'translateX(75px)' }
             ], {
                 duration: 500, // アニメーションの時間（ミリ秒）
                 easing: 'ease', // アニメーションのイージング

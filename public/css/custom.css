@@ -199,3 +199,11 @@
     display: none;
   }
 }
+
+/* 600px以下の場合に表示 */
+@media (max-width: 600px) {
+  .delete-btn {
+    position: relative;
+    left: -30px;
+  }
+}

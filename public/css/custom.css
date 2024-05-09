@@ -178,11 +178,6 @@
     width: calc(100% - 55px);
   }
 
-  .delete-btn {
-    position: relative;
-    left: -30px;
-  }
-
   .main-footer {
       height: 70px;
       font-size: 0.8em;

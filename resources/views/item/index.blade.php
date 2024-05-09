@@ -209,12 +209,12 @@
                                             </div>
 
                                             <!-- 編集・削除ボタン -->
-                                            <div class="d-flex">
-                                                <div id="editBtn_{{ $item->id }}" class="edit-form m-2 mr-4" style="height: 2.4em;">
+                                            <div class="d-flex" style="height: 2.4em;">
+                                                <div id="editBtn_{{ $item->id }}" class="edit-form m-2 mr-4">
                                                     <p class="btn rounded-pill btn-size mirror-btn" onclick="editItem('{{ $item->id }}');">編集</p>
                                                 </div>
                                                 @if(auth()->id() == $item->user_id)
-                                                    <div id="deleteBtn_{{ $item->id }}" class="d-flex delete-form m-2 ml-4" style="height: 2.4em;">
+                                                    <div id="deleteBtn_{{ $item->id }}" class="d-flex delete-form m-2 ml-4">
                                                         <form method="POST" action="{{ url('items/delete') }}" id="delete-form_{{ $item->id }}">
                                                             @csrf
                                                             <input type="hidden" name="id" value="{{ $item->id }}">
@@ -285,6 +285,10 @@
             // 入力フィールドを非表示にする
             document.getElementById('editBox_' + itemId).style.display = 'none';
 
+            // ボタンエリアの余白を調整
+            var parentElement = document.getElementById('editBtn_' + itemId).parentElement;
+            parentElement.style.height = '2.4em';
+
             // 編集ボタンを元に戻す
             document.getElementById('editSubmitBox_' + itemId).style.display = 'none';
             document.getElementById('editBtn_' + itemId).style.display = 'block';
@@ -316,6 +320,10 @@
 
             // 編集ボタンを有効にする
             document.getElementById('editSubmitBox_' + itemId).style.display = 'block';
+
+            // ボタンエリアの余白を調整
+            var parentElement = document.getElementById('editBtn_' + itemId).parentElement;
+            parentElement.style.height = '0';
 
             // editBtn を非表示にする
             var editBtn = document.getElementById('editBtn_' + itemId);

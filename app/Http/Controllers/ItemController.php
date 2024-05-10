@@ -76,7 +76,14 @@ class ItemController extends Controller
      */
     public function index(Request $request, $user_id = null)
     {
-        $requestSearch = $request->input('search');
+        // 検索機能
+        if ($request->clear) {
+            $requestSearch = "";
+        } elseif ($request->input('search')) {
+            $requestSearch = $request->input('search');
+        } else {
+            $requestSearch = $request->session()->get('requestSearch', '');
+        }
         $request->session()->put('requestSearch', $requestSearch);
 
         if ($user_id == "admin") {

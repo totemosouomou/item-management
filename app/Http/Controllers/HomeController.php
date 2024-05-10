@@ -28,8 +28,14 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->isMethod('post')) {
+            $requestSearch = $request->input('search');
+            $request->session()->put('requestSearch', $requestSearch);
+            return redirect()->route('index');
+        }
+
         $itemsPerUser = Item::select('user_id', DB::raw('count(*) as total'))
             ->groupBy('user_id')
             ->with('user')

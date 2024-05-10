@@ -19,11 +19,11 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::match(['get', 'post'], '/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::prefix('items')->group(function () {
     // 記事一覧を表示するルート
-    Route::match(['get', 'post'], '/', [App\Http\Controllers\ItemController::class, 'index']);
+    Route::match(['get', 'post'], '/', [App\Http\Controllers\ItemController::class, 'index'])->name('index');
     // 特定のユーザーに関連付けられた記事一覧を表示するルート
     Route::match(['get', 'post'], '/user/{user_id}', [App\Http\Controllers\ItemController::class, 'index'])->name('user');
     // 期間に応じた記事一覧を表示するルート

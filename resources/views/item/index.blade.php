@@ -40,7 +40,9 @@
                 </div>
                 <div class="card-body">
                 @if(session('requestSearch'))
-                    <form method="get" action="">
+                    <form method="post" action="">
+                        @csrf
+                        <input type="hidden" name="clear" value="clear">
                         <button class="btn btn-outline-secondary" type="submit">
                             {{ session('requestSearch') }}　&times;
                         </button>

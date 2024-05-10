@@ -111,11 +111,11 @@ class ItemController extends Controller
 
         if ($user_id) {
             $title_name = $user->name . "さんの記事";
-            $items = Item::with('posts')->where('user_id', $user_id)->where('title', 'like', '%' . $this->secureSearch($requestSearch) . '%')->orderBy('created_at', 'desc')->paginate($this->pagination());
+            $items = Item::with('posts')->where('user_id', $user_id)->where('title', 'like', '%' . $this->secure($requestSearch) . '%')->orderBy('created_at', 'desc')->paginate($this->pagination());
         } elseif ($title_name !== '全記事') {
-            $items = Item::with('posts')->where('stage', $stage)->where('title', 'like', '%' . $this->secureSearch($requestSearch) . '%')->orderBy('created_at', 'desc')->paginate($this->pagination());
+            $items = Item::with('posts')->where('stage', $stage)->where('title', 'like', '%' . $this->secure($requestSearch) . '%')->orderBy('created_at', 'desc')->paginate($this->pagination());
         } else {
-            $items = Item::with('posts')->where('title', 'like', '%' . $this->secureSearch($requestSearch) . '%')->orderBy('created_at', 'desc')->paginate($this->pagination());
+            $items = Item::with('posts')->where('title', 'like', '%' . $this->secure($requestSearch) . '%')->orderBy('created_at', 'desc')->paginate($this->pagination());
         }
 
         // Trait内のメソッドを呼び出し、ユーザーの作成日から期間を取得する
@@ -126,15 +126,15 @@ class ItemController extends Controller
     }
 
     /**
-     * セキュリティ対策を施した検索処理
+     * セキュリティ対策を施す処理
      *
-     * @param string $searchWord
+     * @param string $word
      * @return string
      */
-    private function secureSearch($searchWord)
+    private function secure($word)
     {
-        // 検索値をサニタイズして返す
-        return htmlspecialchars($searchWord, ENT_QUOTES, 'UTF-8');
+        // 値をサニタイズして返す
+        return htmlspecialchars($word, ENT_QUOTES, 'UTF-8');
     }
 
     /**
@@ -163,13 +163,13 @@ class ItemController extends Controller
             // 記事登録
             $item = Item::create([
                 'user_id' => Auth::user()->id,
-                'title' => $request->input('title'),
-                'url' => $request->input('url'),
+                'title' => $this->secure($request->input('title')),
+                'url' => $this->secure($request->input('url')),
                 'stage' => $period,
             ]);
 
             // コメント登録
-            $post = $request->input('post');
+            $post = $this->secure($request->input('post'));
             if (!empty($post)) { // コメントが空でない場合のみ登録
                 Post::create([
                     'user_id' => Auth::id(),
@@ -213,15 +213,15 @@ class ItemController extends Controller
 
                 // 記事更新
                 Item::where('id', $request->id)->update([
-                    'title' => $request->title,
-                    'url' => $request->url,
+                    'title' => $this->secure($request->title),
+                    'url' => $this->secure($request->url),
                 ]);
 
                 // コメント更新
                 if ($postBeforeUpdate) {
                     if ($request->post) {
                         $postBeforeUpdate->update([
-                            'post' => $request->post . " by " . Auth::user()->name,
+                            'post' => $this->secure($request->post) . " by " . Auth::user()->name,
                         ]);
                     } else {
                         $postBeforeUpdate->delete();
@@ -230,7 +230,7 @@ class ItemController extends Controller
                     Post::create([
                         'user_id' => Auth::id(),
                         'item_id' => $request->id,
-                        'post' => $request->post . " by " . Auth::user()->name,
+                        'post' => $this->secure($request->post) . " by " . Auth::user()->name,
                     ]);
                 }
 

@@ -69,6 +69,10 @@
   color: #fff;
 }
 
+.form-control-navbar {
+  height: 40px;
+}
+
 .card-primary:not(.card-outline)>.card-header {
   background-color: #fff;
   color: #212529;

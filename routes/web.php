@@ -23,19 +23,16 @@ Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('ho
 
 Route::prefix('items')->group(function () {
     // 記事一覧を表示するルート
-    Route::get('/', [App\Http\Controllers\ItemController::class, 'index']);
+    Route::match(['get', 'post'], '/', [App\Http\Controllers\ItemController::class, 'index']);
     // 特定のユーザーに関連付けられた記事一覧を表示するルート
-    Route::get('/user/{user_id}', [App\Http\Controllers\ItemController::class, 'index'])->name('user');
+    Route::match(['get', 'post'], '/user/{user_id}', [App\Http\Controllers\ItemController::class, 'index'])->name('user');
     // 期間に応じた記事一覧を表示するルート
-    Route::get('/term', [App\Http\Controllers\ItemController::class, 'index'])->name('term');
-    Route::get('/quarter', [App\Http\Controllers\ItemController::class, 'index'])->name('quarter');
-    Route::get('/month', [App\Http\Controllers\ItemController::class, 'index'])->name('month');
-    Route::get('/week', [App\Http\Controllers\ItemController::class, 'index'])->name('week');
+    Route::match(['get', 'post'], '/term', [App\Http\Controllers\ItemController::class, 'index'])->name('term');
+    Route::match(['get', 'post'], '/quarter', [App\Http\Controllers\ItemController::class, 'index'])->name('quarter');
+    Route::match(['get', 'post'], '/month', [App\Http\Controllers\ItemController::class, 'index'])->name('month');
+    Route::match(['get', 'post'], '/week', [App\Http\Controllers\ItemController::class, 'index'])->name('week');
 
-    Route::get('/add', [App\Http\Controllers\ItemController::class, 'add']);
-    Route::post('/add', [App\Http\Controllers\ItemController::class, 'add']);
-    Route::get('/update', [App\Http\Controllers\ItemController::class, 'update']);
-    Route::post('/update', [App\Http\Controllers\ItemController::class, 'update']);
-    Route::get('/delete', [App\Http\Controllers\ItemController::class, 'delete']);
-    Route::post('/delete', [App\Http\Controllers\ItemController::class, 'delete']);
+    Route::match(['get', 'post'], '/add', [App\Http\Controllers\ItemController::class, 'add']);
+    Route::match(['get', 'post'], '/update', [App\Http\Controllers\ItemController::class, 'update']);
+    Route::match(['get', 'post'], '/delete', [App\Http\Controllers\ItemController::class, 'delete']);
 });

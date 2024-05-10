@@ -39,6 +39,13 @@
                     </div>
                 </div>
                 <div class="card-body">
+                @if(session('requestSearch'))
+                    <form method="get" action="">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            {{ session('requestSearch') }}　&times;
+                        </button>
+                    </form>
+                @endif
                     <div class="d-flex flex-wrap">
 
                         <!-- add表示用のモーダル -->
@@ -236,7 +243,7 @@
                 {{-- ページネーション --}}
                 @if ($items->hasPages())
                     <div class="card-footer clearfix pb-0">
-                        {{ $items->links() }}
+                        {{ $items->appends(['search' => session('requestSearch')])->links() }}
                     </div>
                 @endif
             </div>

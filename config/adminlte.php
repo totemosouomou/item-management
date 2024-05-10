@@ -340,7 +340,11 @@ return [
             'text'       => '学びにプラス',
             'url'        => 'https://www.techis-learning.jp/study',
         ],
-
+        [
+            'type'         => 'navbar-search',
+            'text'         => 'search',
+            'topnav_right' => true,
+        ],
         // AdminLTEデフォルト
         /*
         // Navbar items:

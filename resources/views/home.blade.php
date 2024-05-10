@@ -103,11 +103,12 @@
             const itemsPerUser = @json($itemsPerUser);
             const sortedItems = itemsPerUser.sort((a, b) => b.total - a.total);
             const labels = sortedItems.map(item => item.user.name);
+            const abbreviatedLabels = labels.map(label => label.length > 8 ? label.slice(0, 8) + '...' : label);
             const data = sortedItems.map(item => item.total);
             const urls = sortedItems.map(item => `/items/user/${item.user.id}`);
 
             // 上位5ユーザーとその他のデータを分ける
-            const topFiveLabels = labels.slice(0, 5);
+            const topFiveLabels = abbreviatedLabels.slice(0, 5);
             const topFiveData = data.slice(0, 5);
             const othersData = data.slice(5).reduce((acc, cur) => acc + cur, 0);
             const topFiveUrls = urls.slice(0, 5);

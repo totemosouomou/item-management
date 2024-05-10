@@ -71,10 +71,14 @@ class ItemController extends Controller
      * 記事一覧
      *
      * @param int|null $user_id
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\View\View
      */
-    public function index($user_id = null)
+    public function index(Request $request, $user_id = null)
     {
+        $requestSearch = $request->input('search');
+        $request->session()->put('requestSearch', $requestSearch);
+
         if ($user_id == "admin") {
             return redirect()->route('user', ['user_id' => auth()->id()]);
         }
@@ -100,18 +104,30 @@ class ItemController extends Controller
 
         if ($user_id) {
             $title_name = $user->name . "さんの記事";
-            $items = Item::with('posts')->where('user_id', $user_id)->orderBy('created_at', 'desc')->paginate($this->pagination());
+            $items = Item::with('posts')->where('user_id', $user_id)->where('title', 'like', '%' . $this->secureSearch($requestSearch) . '%')->orderBy('created_at', 'desc')->paginate($this->pagination());
         } elseif ($title_name !== '全記事') {
-            $items = Item::with('posts')->where('stage', $stage)->orderBy('created_at', 'desc')->paginate($this->pagination());
+            $items = Item::with('posts')->where('stage', $stage)->where('title', 'like', '%' . $this->secureSearch($requestSearch) . '%')->orderBy('created_at', 'desc')->paginate($this->pagination());
         } else {
-            $items = Item::with('posts')->orderBy('created_at', 'desc')->paginate($this->pagination());
+            $items = Item::with('posts')->where('title', 'like', '%' . $this->secureSearch($requestSearch) . '%')->orderBy('created_at', 'desc')->paginate($this->pagination());
         }
 
         // Trait内のメソッドを呼び出し、ユーザーの作成日から期間を取得する
         $createdAt = Auth::user()->created_at;
         $period = $this->getPeriodFromCreationDate($createdAt);
 
-        return view('item.index', compact('stage', 'titleNames', 'items', 'title_name', 'period'));
+        return view('item.index', compact('stage', 'titleNames', 'items', 'title_name', 'period'))->with('requestSearch', $requestSearch);
+    }
+
+    /**
+     * セキュリティ対策を施した検索処理
+     *
+     * @param string $searchWord
+     * @return string
+     */
+    private function secureSearch($searchWord)
+    {
+        // 検索値をサニタイズして返す
+        return htmlspecialchars($searchWord, ENT_QUOTES, 'UTF-8');
     }
 
     /**

@@ -211,6 +211,7 @@
   }
 
   .submit-responsive {
+    padding: 4px 15px;
     position: relative;
     left: -30px;
   }

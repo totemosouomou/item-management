@@ -285,7 +285,7 @@
             }
         }
 
-        // 投稿画面で、urlからタイトルを自動取得
+        // 投稿画面で、urlからタイトルとブログカードを自動取得
         function urlToTitle(input) {
 
             // 同一form内のinput.urlを指定する
@@ -301,7 +301,9 @@
                     method: 'GET',
                     success: function(response) {
                         if (response.meta && response.meta.title) {
+                            var modalContent = response.html;
                             titleInput.value = response.meta.title.replace(' - Qiita', '');
+                            $('#urlModalAdd').find('.iframely-embed').html(modalContent).show();
                         }
                     }
                 });

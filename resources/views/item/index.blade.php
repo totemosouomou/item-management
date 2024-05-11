@@ -122,7 +122,7 @@
                             </figure>
 
                             <!-- URL表示用のモーダル -->
-                            <div class="modal fade" id="urlModal{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="urlModalLabel{{ $item->id }}" aria-hidden="true">
+                            <div class="modal fade" id="urlModal{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="urlModalLabel{{ $item->id }}" aria-hidden="true" data-url="{{ $item->url }}">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
@@ -211,12 +211,11 @@
                                             </div>
 
                                             <!-- ブログカード表示 -->
-                                            <div class="iframely-embed">
+                                            <div class="iframely-embed" style="display: none;">
                                                 <div>
                                                     <a href="{{ $item->url }}" data-iframely-url="//cdn.iframe.ly/api/iframe?url={{ $item->url }}&media=0&api_key={{ config('iframely.api.key') }}"></a>
                                                 </div>
                                             </div>
-
                                             <!-- 編集・削除ボタン -->
                                             <div class="d-flex" style="height: 2.4em;">
                                                 <div id="editBtn_{{ $item->id }}" class="edit-form m-2 mr-4">
@@ -272,6 +271,18 @@
         function setPeriodValue(period) {
             document.getElementById('periodValue').value = period;
         }
+
+        // モーダルが開いたときのイベントを検知するためのスクリプト
+        $('.modal').on('show.bs.modal', function () {
+            var itemId = $(this).attr('id').replace('urlModal', '');
+            console.log(itemId);
+            var embedUrl = $(this).data('url');
+            console.log(embedUrl);
+            var modalContent = '<div>';
+            modalContent += '<a href="' + embedUrl + '" data-iframely-url="//cdn.iframe.ly/api/iframe?url=' + embedUrl + '&media=0&api_key={{ config('iframely.api.key') }}"></a>';
+            modalContent += '</div>';
+            $(this).find('.iframely-embed').html(modalContent).show();
+        });
 
         // モーダルが閉じたときのイベントを検知するためのスクリプト
         $('.modal').on('hidden.bs.modal', function (e) {

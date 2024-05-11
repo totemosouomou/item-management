@@ -93,8 +93,8 @@
                                         <div class="d-flex">
                                             <div class="edit-form m-2 mr-4">
                                                 @if (isset($titleNames[$stage]) && $stage !== $period)
-                                                    <button type="submit" class="btn rounded-pill btn-size submit-btn ml-5 selest-submit-responsive" onclick="setPeriodValue('{{ $stage }}')">{{ $titleNames[$stage] }}へ投稿</button>
-                                                    <button type="submit" class="btn rounded-pill btn-size mirror-btn ml-2 selest-submit-responsive" onclick="setPeriodValue('{{ $period }}')">{{ $titleNames[$period] }}へ投稿</button>
+                                                    <button type="submit" class="btn rounded-pill btn-size submit-btn ml-5 submit-responsive" onclick="setPeriodValue('{{ $stage }}')">{{ $titleNames[$stage] }}へ投稿</button>
+                                                    <button type="submit" class="btn rounded-pill btn-size mirror-btn ml-2 submit-responsive" onclick="setPeriodValue('{{ $period }}')">{{ $titleNames[$period] }}へ投稿</button>
                                                     <input type="hidden" name="period" id="periodValue">
                                                 @else
                                                     <button type="submit" class="btn rounded-pill btn-size submit-btn ml-5">投稿</button>

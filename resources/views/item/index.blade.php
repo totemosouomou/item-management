@@ -285,6 +285,29 @@
             }
         }
 
+        // 投稿画面で、urlからタイトルを自動取得
+        function urlToTitle(input) {
+
+            // 同一form内のinput.urlを指定する
+            var form = input.closest('form');
+            var urlInput = form.querySelector('input[name="url"]');
+            var titleInput = form.querySelector('input[name="title"]');
+            var url = urlInput.value;
+            if (!titleInput.value && urlInput.value) {
+
+                // APIからデータを取得する処理
+                $.ajax({
+                    url: '//cdn.iframe.ly/api/iframely?url=' + encodeURIComponent(url) + '&api_key={{ config('iframely.api.key') }}',
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.meta && response.meta.title) {
+                            titleInput.value = response.meta.title.replace(' - Qiita', '');
+                        }
+                    }
+                });
+            }
+        }
+
         // モーダルが閉じたときのイベントを検知するためのスクリプト
         $('.modal').on('hidden.bs.modal', function (e) {
             var itemId = $(this).attr('id').replace('urlModal', '');

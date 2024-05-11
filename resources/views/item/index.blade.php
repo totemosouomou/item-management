@@ -51,7 +51,7 @@
                     <div class="d-flex flex-wrap">
 
                         <!-- add表示用のモーダル -->
-                        <div class="modal fade" id="urlModalAdd" tabindex="-1" role="dialog" aria-labelledby="urlModalLabelAdd" aria-hidden="true">
+                        <div class="modal fade" id="urlModalAdd" tabindex="-1" role="dialog" aria-labelledby="urlModalLabelAdd" aria-hidden="true" data-url="https://youtu.be/kyRMuV8oJVY">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -93,8 +93,8 @@
                                         <div class="d-flex">
                                             <div class="edit-form m-2 mr-4">
                                                 @if (isset($titleNames[$stage]) && $stage !== $period)
-                                                    <button type="submit" class="btn rounded-pill btn-size submit-btn ml-5" onclick="setPeriodValue('{{ $stage }}')">{{ $titleNames[$stage] }}へ投稿</button>
-                                                    <button type="submit" class="btn rounded-pill btn-size mirror-btn ml-2" onclick="setPeriodValue('{{ $period }}')">{{ $titleNames[$period] }}へ投稿</button>
+                                                    <button type="submit" class="btn rounded-pill btn-size submit-btn ml-5 selest-submit-responsive" onclick="setPeriodValue('{{ $stage }}')">{{ $titleNames[$stage] }}へ投稿</button>
+                                                    <button type="submit" class="btn rounded-pill btn-size mirror-btn ml-2 selest-submit-responsive" onclick="setPeriodValue('{{ $period }}')">{{ $titleNames[$period] }}へ投稿</button>
                                                     <input type="hidden" name="period" id="periodValue">
                                                 @else
                                                     <button type="submit" class="btn rounded-pill btn-size submit-btn ml-5">投稿</button>
@@ -104,11 +104,7 @@
                                         </div>
 
                                         <!-- ブログカード表示 -->
-                                        <div class="iframely-embed mt-2">
-                                            <div>
-                                                <a href="https://youtu.be/kyRMuV8oJVY?si=dilNpM_bdLjLEKMe" data-iframely-url="//cdn.iframe.ly/api/iframe?url=https://youtu.be/kyRMuV8oJVY?si=dilNpM_bdLjLEKMe&autoplay=0&api_key={{ config('iframely.api.key') }}"></a>
-                                            </div>
-                                        </div>
+                                        <div class="iframely-embed mt-2" style="display: none;"></div>
 
                                     </div>
                                 </div>
@@ -211,11 +207,8 @@
                                             </div>
 
                                             <!-- ブログカード表示 -->
-                                            <div class="iframely-embed" style="display: none;">
-                                                <div>
-                                                    <a href="{{ $item->url }}" data-iframely-url="//cdn.iframe.ly/api/iframe?url={{ $item->url }}&media=0&api_key={{ config('iframely.api.key') }}"></a>
-                                                </div>
-                                            </div>
+                                            <div class="iframely-embed" style="display: none;"></div>
+
                                             <!-- 編集・削除ボタン -->
                                             <div class="d-flex" style="height: 2.4em;">
                                                 <div id="editBtn_{{ $item->id }}" class="edit-form m-2 mr-4">
@@ -275,13 +268,11 @@
         // モーダルが開いたときのイベントを検知するためのスクリプト
         $('.modal').on('show.bs.modal', function () {
             var itemId = $(this).attr('id').replace('urlModal', '');
-            console.log(itemId);
             var embedUrl = $(this).data('url');
             console.log(embedUrl);
-            var modalContent = '<div>';
-            modalContent += '<a href="' + embedUrl + '" data-iframely-url="//cdn.iframe.ly/api/iframe?url=' + embedUrl + '&media=0&api_key={{ config('iframely.api.key') }}"></a>';
-            modalContent += '</div>';
+            var modalContent = '<div><a href="' + embedUrl + '" data-iframely-url="//cdn.iframe.ly/api/iframe?url=' + embedUrl + '&media=0&api_key={{ config('iframely.api.key') }}"></a></div>';
             $(this).find('.iframely-embed').html(modalContent).show();
+            // $(this).find('.iframely-embed').css('min-height', '200px');
         });
 
         // モーダルが閉じたときのイベントを検知するためのスクリプト

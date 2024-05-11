@@ -206,6 +206,13 @@
 
 /* 600px以下の場合に表示 */
 @media (max-width: 600px) {
+  .select-submit-responsive {
+    padding: 4px 15px;
+    font-size: 0.7em;
+    position: relative;
+    left: -30px;
+  }
+
   .delete-btn {
     position: relative;
     left: -30px;

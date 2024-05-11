@@ -69,22 +69,22 @@
                                             @csrf
                                             <div class="row">
                                                 <div class="col-sm-1">
-                                                    <label for="title" class="form-label-sm text-muted" style="position: relative; top: 6px; left: 10px;">Title</label>
-                                                </div>
-                                                <div class="col-sm-11">
-                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 0px;" id="title" name="title" placeholder="記事のタイトルなど、わかりやすい見出しにしましょう">
-                                                </div>
-                                                <div class="col-sm-1">
                                                     <label for="url" class="form-label-sm text-muted" style="position: relative; top: 11px; left: 10px;">URL</label>
                                                 </div>
                                                 <div class="col-sm-11">
-                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 4px;" id="url" name="url" placeholder="リンク先となる記事のURLを入力しましょう">
+                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 4px;" id="url" name="url" placeholder="URLを入力しましょう" value="{{ old('url') }}">
+                                                </div>
+                                                <div class="col-sm-1">
+                                                    <label for="title" class="form-label-sm text-muted" style="position: relative; top: 6px; left: 10px;">Title</label>
+                                                </div>
+                                                <div class="col-sm-11">
+                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 0px;" id="title" name="title" placeholder="わかりやすい見出しにしましょう" value="{{ old('title') }}" onClick="urlToTitle(this)">
                                                 </div>
                                                 <div class="col-sm-1">
                                                     <label for="post" class="form-label-sm text-muted" style="position: relative; top: 15px; left: 8px;">Post</label>
                                                 </div>
                                                 <div class="col-sm-11">
-                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 8px;" id="post" name="post" placeholder="コメントを入力できます">
+                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 8px;" id="post" name="post" value="{{ old('post') }}" placeholder="コメントを入力できます">
                                                 </div>
                                             </div>
                                         </div>
@@ -112,7 +112,7 @@
                         </div>
 
                         @foreach ($items as $item)
-                            <figure class="m-3 contents" data-toggle="modal" data-target="#urlModal{{ $item->id }}">
+                            <figure class="m-3 contents" data-toggle="modal" data-target="#urlModal{{ $item->id }}" onClick="openModal(this, '{{ $item->url }}')">
                                 <figcaption class="text-dark font-weight-bold">{{ $item->title }}</figcaption>
                                     <p>{{ \Illuminate\Support\Str::limit($item->url, 45, $end='...') }}</p>
                             </figure>
@@ -175,16 +175,16 @@
                                                 @csrf
                                                 <div class="row">
                                                     <div class="col-sm-1">
-                                                        <label for="title" class="form-label-sm text-muted" style="position: relative; top: 6px; left: 10px;">Title</label>
-                                                    </div>
-                                                    <div class="col-sm-11">
-                                                        <input type="text" class="form-control mb-2" style="position: relative; top: 0px;" id="title" name="title" placeholder="記事のタイトルなど、わかりやすい見出しにしましょう" value="{{ $item->title }}">
-                                                    </div>
-                                                    <div class="col-sm-1">
                                                         <label for="url" class="form-label-sm text-muted" style="position: relative; top: 11px; left: 10px;">URL</label>
                                                     </div>
                                                     <div class="col-sm-11">
-                                                        <input type="text" class="form-control mb-2" style="position: relative; top: 4px;" id="url" name="url" placeholder="リンク先となる記事のURLを入力しましょう" value="{{ $item->url }}">
+                                                        <input type="text" class="form-control mb-2" style="position: relative; top: 4px;" id="url" name="url" placeholder="URLを入力しましょう" value="{{ $item->url }}">
+                                                    </div>
+                                                    <div class="col-sm-1">
+                                                        <label for="title" class="form-label-sm text-muted" style="position: relative; top: 6px; left: 10px;">Title</label>
+                                                    </div>
+                                                    <div class="col-sm-11">
+                                                        <input type="text" class="form-control mb-2" style="position: relative; top: 0px;" id="title" name="title" placeholder="わかりやすい見出しにしましょう" value="{{ $item->title }}">
                                                     </div>
                                                     <div class="col-sm-1">
                                                         <label for="post" class="form-label-sm text-muted" style="position: relative; top: 15px; left: 8px;">Post</label>
@@ -265,15 +265,25 @@
             document.getElementById('periodValue').value = period;
         }
 
-        // モーダルが開いたときのイベントを検知するためのスクリプト
-        $('.modal').on('show.bs.modal', function () {
-            var itemId = $(this).attr('id').replace('urlModal', '');
-            var embedUrl = $(this).data('url');
-            console.log(embedUrl);
-            var modalContent = '<div><a href="' + embedUrl + '" data-iframely-url="//cdn.iframe.ly/api/iframe?url=' + embedUrl + '&media=0&api_key={{ config('iframely.api.key') }}"></a></div>';
-            $(this).find('.iframely-embed').html(modalContent).show();
-            // $(this).find('.iframely-embed').css('min-height', '200px');
-        });
+        // モーダルがh開いたときのイベントを検知するためのスクリプト
+        function openModal(element, embedUrl) {
+
+            // data-target属性の値からモーダルのIDを取得
+            var modalId = element.getAttribute('data-target').replace('#', '');
+            if (!$('#' + modalId).find('.iframely-embed').html()) {
+
+                // APIからデータを取得する処理
+                $.ajax({
+                    url: '//cdn.iframe.ly/api/iframely?url=' + encodeURIComponent(embedUrl) + '&api_key={{ config('iframely.api.key') }}',
+                    method: 'GET',
+                    success: function(response) {
+                        var modalContent = response.html;
+                        // モーダル内の特定の要素に挿入する
+                        $('#' + modalId).find('.iframely-embed').html(modalContent).show();
+                    }
+                });
+            }
+        }
 
         // モーダルが閉じたときのイベントを検知するためのスクリプト
         $('.modal').on('hidden.bs.modal', function (e) {
@@ -363,7 +373,7 @@
             if (window.innerWidth <= 600) {
                 animation = deleteBtn.animate([
                     { transform: 'translateX(0)' },
-                    { transform: 'translateX(30px)' }
+                    { transform: 'translateX(60px)' }
                 ], {
                     duration: 500, // アニメーションの時間（ミリ秒）
                     easing: 'ease', // アニメーションのイージング

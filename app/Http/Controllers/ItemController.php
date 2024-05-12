@@ -184,7 +184,9 @@ class ItemController extends Controller
             return redirect("/items/{$period}")->with('success', '記事が登録されました。');
         }
 
-        session(['url' => $urlInput]);
+        if(!empty($urlInput)) {
+            session(['url' => $urlInput]);
+        }
         return redirect("/items/{$period}")->with('add', "記事登録");
     }
 

@@ -34,6 +34,12 @@ trait ArticleController
 
         // レスポンスを処理する
         $articles = json_decode($response, true);
+        $filteredArticles = array_map(function($article) {
+            return [
+                'url' => $this->secure($article['url']),
+                'title' => $this->secure($article['title']),
+            ];
+        }, $articles);
         return $articles;
     }
 }

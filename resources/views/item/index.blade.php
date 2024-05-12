@@ -72,8 +72,7 @@
                                                     <label for="url" class="form-label-sm text-muted" style="position: relative; top: 11px; left: 10px;">URL</label>
                                                 </div>
                                                 <div class="col-sm-11">
-                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 4px;" id="url" name="url" placeholder="URLを入力しましょう" value="{{ htmlspecialchars(session('url') ?: old('url')) }}
-">
+                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 4px;" id="url" name="url" placeholder="URLを入力しましょう" value="{{ session('url') ?: old('url') }}">
                                                 </div>
                                                 <div class="col-sm-1">
                                                     <label for="title" class="form-label-sm text-muted" style="position: relative; top: 6px; left: 10px;">Title</label>

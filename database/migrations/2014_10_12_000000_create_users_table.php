@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 50);
+            $table->string('name', 100);  // htmlspecialcharsによる文字列長対策
             $table->string('email')->charset('utf8')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

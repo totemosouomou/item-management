@@ -125,7 +125,7 @@ class ItemController extends Controller
 
         $articles = $this->getQiitaArticles($requestSearch);
 
-        return view('item.index', compact('stage', 'titleNames', 'items', 'title_name', 'period', 'articles'))->with('requestSearch', $requestSearch);
+        return view('item.index', compact('stage', 'titleNames', 'items', 'title_name', 'period', 'articles'))->with('requestSearch', $requestSearch)->with('url', session('url'));
     }
 
     /**

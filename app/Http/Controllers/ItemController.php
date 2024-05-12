@@ -125,7 +125,7 @@ class ItemController extends Controller
 
         $articles = $this->getQiitaArticles($requestSearch);
 
-        return view('item.index', compact('stage', 'titleNames', 'items', 'title_name', 'period', 'articles'))->with('requestSearch', $requestSearch)->with('url', $this->secure(session('url')));
+        return view('item.index', compact('stage', 'titleNames', 'items', 'title_name', 'period', 'articles'))->with('requestSearch', $requestSearch)->with('url', session('url'));
     }
 
     /**
@@ -184,7 +184,7 @@ class ItemController extends Controller
             return redirect("/items/{$period}")->with('success', '記事が登録されました。');
         }
 
-        return redirect("/items/{$period}")->with('add', "記事登録")->with('url', $urlInput);
+        return redirect("/items/{$period}")->with('add', "記事登録")->with('url', $this->secure($urlInput));
     }
 
     /**

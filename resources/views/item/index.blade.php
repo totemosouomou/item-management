@@ -72,7 +72,7 @@
                                                     <label for="url" class="form-label-sm text-muted" style="position: relative; top: 11px; left: 10px;">URL</label>
                                                 </div>
                                                 <div class="col-sm-11">
-                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 4px;" id="url" name="url" placeholder="URLを入力しましょう" value="{{ old('url') }}">
+                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 4px;" id="url" name="url" placeholder="URLを入力しましょう" value="{{ session('url') ?? old('url') }}">
                                                 </div>
                                                 <div class="col-sm-1">
                                                     <label for="title" class="form-label-sm text-muted" style="position: relative; top: 6px; left: 10px;">Title</label>
@@ -111,6 +111,7 @@
                             </div>
                         </div>
 
+                        @if (!empty($items))
                         @foreach ($items as $item)
                             <figure class="m-3 contents" data-toggle="modal" data-target="#urlModal{{ $item->id }}" onClick="openModal(this, '{{ $item->url }}')">
                                 <figcaption class="text-dark font-weight-bold">{{ $item->title }}</figcaption>
@@ -232,14 +233,21 @@
                                 </div>
                             </div>
                         @endforeach
+                        @else
+                            <p>No articles found.</p>
+                        @endif
                     </div>
                 </div>
-                {{-- ページネーション --}}
+                <!-- ページネーション -->
                 @if ($items->hasPages())
                     <div class="card-footer clearfix pb-0">
                         {{ $items->appends(['search' => session('requestSearch')])->links() }}
                     </div>
                 @endif
+            </div>
+
+                <!-- Qitta記事をapiで取得 -->
+                @include('item.articles')
             </div>
         </div>
     </div>
@@ -316,6 +324,11 @@
 
             // itemIdが"Add"の場合は処理をスキップする
             if (itemId === "Add") {
+                var urlInputValue = document.getElementById('urlModalAdd').querySelector('input[name="url"]');
+                if (urlInputValue) {
+                    urlInputValue.value = "";
+                }
+                sessionStorage.removeItem('url');
                 return;
             }
 

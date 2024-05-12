@@ -6,13 +6,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\PeriodCalculator;
+use App\Http\Controllers\Traits\ArticleController;
 use App\Models\User;
 use App\Models\Item;
 use App\Models\Post;
 
 class ItemController extends Controller
 {
-    use PeriodCalculator;
+    use PeriodCalculator, ArticleController;
 
     /**
      * Create a new controller instance.
@@ -122,7 +123,9 @@ class ItemController extends Controller
         $createdAt = Auth::user()->created_at;
         $period = $this->getPeriodFromCreationDate($createdAt);
 
-        return view('item.index', compact('stage', 'titleNames', 'items', 'title_name', 'period'))->with('requestSearch', $requestSearch);
+        $articles = $this->getQiitaArticles($requestSearch);
+
+        return view('item.index', compact('stage', 'titleNames', 'items', 'title_name', 'period', 'articles'))->with('requestSearch', $requestSearch);
     }
 
     /**
@@ -143,7 +146,7 @@ class ItemController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function add(Request $request)
+    public function add(Request $request, $urlInput = null)
     {
         // Trait内のメソッドを呼び出し、ユーザーの作成日から期間を取得する
         $createdAt = Auth::user()->created_at;
@@ -181,7 +184,8 @@ class ItemController extends Controller
             return redirect("/items/{$period}")->with('success', '記事が登録されました。');
         }
 
-        return redirect("/items/{$period}")->with('add', '記事登録');
+        session(['url' => $urlInput]);
+        return redirect("/items/{$period}")->with('add', "記事登録");
     }
 
     /**

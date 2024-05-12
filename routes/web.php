@@ -32,7 +32,7 @@ Route::prefix('items')->group(function () {
     Route::match(['get', 'post'], '/month', [App\Http\Controllers\ItemController::class, 'index'])->name('month');
     Route::match(['get', 'post'], '/week', [App\Http\Controllers\ItemController::class, 'index'])->name('week');
 
-    Route::match(['get', 'post'], '/add', [App\Http\Controllers\ItemController::class, 'add']);
+    Route::match(['get', 'post'], '/add/{urlInput?}', [App\Http\Controllers\ItemController::class, 'add'])->where('urlInput', '(.*)');
     Route::match(['get', 'post'], '/update', [App\Http\Controllers\ItemController::class, 'update']);
     Route::match(['get', 'post'], '/delete', [App\Http\Controllers\ItemController::class, 'delete']);
 });

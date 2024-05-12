@@ -72,13 +72,13 @@
                                                     <label for="url" class="form-label-sm text-muted" style="position: relative; top: 11px; left: 10px;">URL</label>
                                                 </div>
                                                 <div class="col-sm-11">
-                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 4px;" id="url" name="url" placeholder="URLを入力しましょう" value="{{ session('url') ?: old('url') }}">
+                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 4px;" id="url" name="url" placeholder="URLを入力しましょう" value="{{ session('urlInput') ?: old('url') }}">
                                                 </div>
                                                 <div class="col-sm-1">
                                                     <label for="title" class="form-label-sm text-muted" style="position: relative; top: 6px; left: 10px;">Title</label>
                                                 </div>
                                                 <div class="col-sm-11">
-                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 0px;" id="title" name="title" placeholder="わかりやすい見出しにしましょう" value="{{ old('title') }}" onClick="urlToTitle(this)">
+                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 0px;" id="title" name="title" placeholder="わかりやすいタイトルにしましょう" value="{{ old('title') }}" onClick="urlToTitle(this)">
                                                 </div>
                                                 <div class="col-sm-1">
                                                     <label for="post" class="form-label-sm text-muted" style="position: relative; top: 15px; left: 8px;">Post</label>
@@ -185,7 +185,7 @@
                                                         <label for="title" class="form-label-sm text-muted" style="position: relative; top: 6px; left: 10px;">Title</label>
                                                     </div>
                                                     <div class="col-sm-11">
-                                                        <input type="text" class="form-control mb-2" style="position: relative; top: 0px;" id="title" name="title" placeholder="わかりやすい見出しにしましょう" value="{{ $item->title }}">
+                                                        <input type="text" class="form-control mb-2" style="position: relative; top: 0px;" id="title" name="title" placeholder="わかりやすいタイトルにしましょう" value="{{ $item->title }}">
                                                     </div>
                                                     <div class="col-sm-1">
                                                         <label for="post" class="form-label-sm text-muted" style="position: relative; top: 15px; left: 8px;">Post</label>
@@ -328,7 +328,7 @@
                 if (urlInputValue) {
                     urlInputValue.value = "";
                 }
-                sessionStorage.removeItem('url');
+                sessionStorage.removeItem('urlInput');
                 return;
             }
 

@@ -60,11 +60,11 @@ class ItemController extends Controller
             'url.required' => 'URLは必須項目です。',
             'url.url' => '有効なURLを入力してください。',
             'url.starts_with' => '有効なHTTPまたはHTTPSのURLを入力してください。',
-            'title.required' => '見出しは必須項目です。',
-            'title.string' => '見出しは文字列で入力してください。',
-            'title.max' => '見出しは100文字以内で入力してください。',
+            'title.required' => 'タイトルは必須項目です。',
+            'title.string' => 'タイトルは文字列で入力してください。',
+            'title.max' => 'タイトルは100文字以内で入力してください。',
             'post.string' => 'コメントは文字列で入力してください。',
-            'post.max' => 'コメントは255文字以内で入力してください。',
+            'post.max' => 'コメントは200文字以内で入力してください。',
         ];
     }
 
@@ -125,7 +125,7 @@ class ItemController extends Controller
 
         $articles = $this->getQiitaArticles($requestSearch);
 
-        return view('item.index', compact('stage', 'titleNames', 'items', 'title_name', 'period', 'articles'))->with('requestSearch', $requestSearch)->with('url', session('url'));
+        return view('item.index', compact('stage', 'titleNames', 'items', 'title_name', 'period', 'articles'))->with('requestSearch', $requestSearch)->with('urlInput', session('urlInput'));
     }
 
     /**
@@ -166,13 +166,13 @@ class ItemController extends Controller
             // 記事登録
             $item = Item::create([
                 'user_id' => Auth::user()->id,
-                'title' => $this->secure($request->input('title')),
+                'title' => mb_strimwidth($this->secure($request->input('title')), 0, 100, ''),
                 'url' => $this->secure($request->input('url')),
                 'stage' => $period,
             ]);
 
             // コメント登録
-            $post = $this->secure($request->input('post'));
+            $post = mb_strimwidth($this->secure($request->input('post')), 0, 200, '');
             if (!empty($post)) { // コメントが空でない場合のみ登録
                 Post::create([
                     'user_id' => Auth::id(),
@@ -184,7 +184,7 @@ class ItemController extends Controller
             return redirect("/items/{$period}")->with('success', '記事が登録されました。');
         }
 
-        return redirect("/items/{$period}")->with('add', "記事登録")->with('url', $this->secure($urlInput));
+        return redirect("/items/{$period}")->with('add', "記事登録")->with('urlInput', $this->secure($urlInput));
     }
 
     /**

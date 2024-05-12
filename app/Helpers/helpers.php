@@ -101,20 +101,16 @@ if (! function_exists('class_uses_recursive')) {
 
 if (! function_exists('e')) {
     /**
-     * Encode HTML special characters in a string or array.
+     * Encode HTML special characters in a string.
      *
-     * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|array|null  $value
+     * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|null  $value
      * @param  bool  $doubleEncode
-     * @return string|array
+     * @return string
      */
     function e($value, $doubleEncode = true)
     {
         if ($value instanceof DeferringDisplayableValue) {
             $value = $value->resolveDisplayableValue();
-        }
-
-        if (is_array($value)) {
-            return array_map('e', $value);
         }
 
         if ($value instanceof Htmlable) {

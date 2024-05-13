@@ -26,7 +26,7 @@ class ItemController extends Controller
     }
 
     /**
-     * ページネーションに使用する数字を返すメソッド
+     * ページネーションに使用する数字を返す
      *
      * @return int
      */
@@ -69,10 +69,22 @@ class ItemController extends Controller
     }
 
     /**
+     * セキュリティ対策を施す処理
+     *
+     * @param string $word
+     * @return string
+     */
+    private function secure($word)
+    {
+        // 値をサニタイズして返す
+        return htmlspecialchars($word, ENT_QUOTES, 'UTF-8');
+    }
+
+    /**
      * 記事一覧
      *
+     * @param \Illuminate\Http\Request  $request
      * @param int|null $user_id
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\View\View
      */
     public function index(Request $request, $user_id = null)
@@ -87,11 +99,11 @@ class ItemController extends Controller
         }
         $request->session()->put('requestSearch', $requestSearch);
 
+        // ユーザーIDが指定されている場合の処理
         if ($user_id == "admin") {
             return redirect()->route('user', ['user_id' => auth()->id()]);
         }
 
-        // バリデーション: ユーザーIDが指定されている場合は存在するかチェックする
         if ($user_id) {
             $user = User::find($user_id);
             if (!$user) {
@@ -99,6 +111,7 @@ class ItemController extends Controller
             }
         }
 
+        // 記事のステージが指定されている場合の処理
         $stage = request()->route()->getName();
         $titleNames = [
             'week' => '1週間以内の記事',
@@ -107,7 +120,6 @@ class ItemController extends Controller
             'term' => '開発課題の記事',
         ];
 
-        // $titleNames 内に指定されたステージが存在するかチェックし、存在しない場合はデフォルトのタイトルを設定
         $title_name = isset($titleNames[$stage]) ? $titleNames[$stage] : "全記事";
 
         if ($user_id) {
@@ -119,25 +131,13 @@ class ItemController extends Controller
             $items = Item::with('posts')->where('title', 'like', '%' . $this->secure($requestSearch) . '%')->orderBy('created_at', 'desc')->paginate($this->pagination());
         }
 
-        // Trait内のメソッドを呼び出し、ユーザーの作成日から期間を取得する
-        $createdAt = Auth::user()->created_at;
-        $period = $this->getPeriodFromCreationDate($createdAt);
+        // Trait内のメソッドを呼び出し、ユーザーのステージを取得
+        $period = $this->getPeriodFromCreationDate();
 
+        // Trait内のメソッドを呼び出し、指定された検索語に基づくQiitaの記事を取得
         $articles = $this->getQiitaArticles($requestSearch);
 
         return view('item.index', compact('stage', 'titleNames', 'items', 'title_name', 'period', 'articles'))->with('requestSearch', $requestSearch)->with('urlInput', session('urlInput'));
-    }
-
-    /**
-     * セキュリティ対策を施す処理
-     *
-     * @param string $word
-     * @return string
-     */
-    private function secure($word)
-    {
-        // 値をサニタイズして返す
-        return htmlspecialchars($word, ENT_QUOTES, 'UTF-8');
     }
 
     /**
@@ -148,9 +148,8 @@ class ItemController extends Controller
      */
     public function add(Request $request, $urlInput = null)
     {
-        // Trait内のメソッドを呼び出し、ユーザーの作成日から期間を取得する
-        $createdAt = Auth::user()->created_at;
-        $period = $this->getPeriodFromCreationDate($createdAt);
+        // Trait内のメソッドを呼び出し、ユーザーのステージを取得
+        $period = $this->getPeriodFromCreationDate();
 
         // POSTリクエストのとき
         if ($request->isMethod('post')) {
@@ -209,6 +208,7 @@ class ItemController extends Controller
             $itemChanged = $item->title !== $request->title || $item->url !== $request->url;
             $postChanged = (!$postBeforeUpdate && $request->post) || ($postBeforeUpdate && $request->post !== $postBeforeUpdateComment);
 
+            // 記事に変更がある場合
             if ($itemChanged || $postChanged) {
 
                 // バリデーションを実行

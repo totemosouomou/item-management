@@ -6,10 +6,15 @@ use Illuminate\Support\Facades\Http;
 
 trait ArticleController
 {
+    /**
+     * 指定された検索語に基づくQiitaの記事を取得
+     *
+     * @param string $requestSearch
+     * @return array
+     */
     public function getQiitaArticles($requestSearch)
     {
         $articles = [];
-        $page = 1;
 
         // アクセストークン
         $accessToken = env('QIITA_API_KEY');

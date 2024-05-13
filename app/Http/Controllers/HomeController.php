@@ -24,18 +24,20 @@ class HomeController extends Controller
     }
 
     /**
-     * Show the application dashboard.
+     * ダッシュボードを表示
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function index(Request $request)
     {
+        // 検索機能
         if ($request->isMethod('post')) {
             $requestSearch = $request->input('search');
             $request->session()->put('requestSearch', $requestSearch);
             return redirect()->route('index');
         }
 
+        // グラフへ渡すユーザーごとの記事の投稿数を取得
         $itemsPerUser = Item::select('user_id', DB::raw('count(*) as total'))
             ->groupBy('user_id')
             ->with('user')
@@ -43,17 +45,15 @@ class HomeController extends Controller
 
         $posts = Post::orderBy('created_at', 'desc')->take(30)->get();
 
-        // Trait内のメソッドを呼び出し、ユーザーの作成日から期間を取得する
-        $createdAt = Auth::user()->created_at;
-        $period = $this->getPeriodFromCreationDate($createdAt);
+        // Trait内のメソッドを呼び出し、ユーザーのステージを取得
+        $period = $this->getPeriodFromCreationDate();
         $randomItem = $this->getRandomItemByPeriod($period);
 
-        // ビューにデータを渡す
         return view('home', compact('itemsPerUser', 'posts', 'randomItem'));
     }
 
     /**
-     * ランダムな期間に基づくアイテムを取得する
+     * ステージに基づく記事をランダムでひとつ取得
      *
      * @param string $period
      * @return mixed

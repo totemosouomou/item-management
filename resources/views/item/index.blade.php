@@ -51,7 +51,7 @@
                     <div class="d-flex flex-wrap">
 
                         <!-- add表示用のモーダル -->
-                        <div class="modal fade" id="urlModalAdd" tabindex="-1" role="dialog" aria-labelledby="urlModalLabelAdd" aria-hidden="true" data-url="https://youtu.be/kyRMuV8oJVY">
+                        <div class="modal fade" id="urlModalAdd" tabindex="-1" role="dialog" aria-labelledby="urlModalLabelAdd" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -119,7 +119,7 @@
                             </figure>
 
                             <!-- URL表示用のモーダル -->
-                            <div class="modal fade" id="urlModal{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="urlModalLabel{{ $item->id }}" aria-hidden="true" data-url="{{ $item->url }}">
+                            <div class="modal fade" id="urlModal{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="urlModalLabel{{ $item->id }}" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
@@ -325,8 +325,11 @@
             // itemIdが"Add"の場合は処理をスキップする
             if (itemId === "Add") {
                 var urlInputValue = document.getElementById('urlModalAdd').querySelector('input[name="url"]');
-                if (urlInputValue) {
-                    urlInputValue.value = "";
+                var titleInputValue = document.getElementById('urlModalAdd').querySelector('input[name="title"]');
+                if (urlInputValue && titleInputValue) {
+                    if (!titleInputValue.value) {
+                        urlInputValue.value = "";
+                    }
                 }
                 sessionStorage.removeItem('urlInput');
                 return;

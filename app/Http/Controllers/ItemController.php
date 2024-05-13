@@ -216,7 +216,7 @@ class ItemController extends Controller
 
                 // 記事更新
                 Item::where('id', $request->id)->update([
-                    'title' => $this->secure($request->title),
+                    'title' => mb_strimwidth($this->secure($request->input('title')), 0, 100, ''),
                     'url' => $this->secure($request->url),
                 ]);
 
@@ -224,7 +224,7 @@ class ItemController extends Controller
                 if ($postBeforeUpdate) {
                     if ($request->post) {
                         $postBeforeUpdate->update([
-                            'post' => $this->secure($request->post) . " by " . Auth::user()->name,
+                            'post' => mb_strimwidth($this->secure($request->input('post')), 0, 200, '') . " by " . Auth::user()->name,
                         ]);
                     } else {
                         $postBeforeUpdate->delete();
@@ -233,7 +233,7 @@ class ItemController extends Controller
                     Post::create([
                         'user_id' => Auth::id(),
                         'item_id' => $request->id,
-                        'post' => $this->secure($request->post) . " by " . Auth::user()->name,
+                        'post' => mb_strimwidth($this->secure($request->input('post')), 0, 200, '') . " by " . Auth::user()->name,
                     ]);
                 }
 

@@ -18,6 +18,7 @@
                     name="{{ $item['text'] }}"
                     placeholder="{{ $item['text'] }}"
                     aria-label="{{ $item['text'] }}">
+                <input type="hidden" name="page" value="">
 
                 {{-- Search buttons --}}
                 <div class="input-group-append">

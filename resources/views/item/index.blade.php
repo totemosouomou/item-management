@@ -138,13 +138,17 @@
                                         <ul class="posts mx-3 mt-1 mb-0 list-unstyled list-inline" id="itemPost_{{ $item->id }}">
                                             @php
                                                 $userPost = null;
+                                                $reversedPosts = $item->posts->reverse()->reject(function ($post) {
+                                                    return $post->user_id === Auth::user()->id;})
+                                                    ->take(10);
+                                                $userPostGet = $item->posts->where('user_id', Auth::user()->id)
+                                                    ->first();
+                                                if ($userPostGet) {
+                                                    $userPost = str_replace(" by " . Auth::user()->name, "", $userPostGet->post);
+                                                    $reversedPosts->prepend($userPostGet);
+                                                }
                                             @endphp
-                                            @foreach ($item->posts as $post)
-                                                @if ($post->user_id == Auth::user()->id)
-                                                    @php
-                                                        $userPost = str_replace(" by " . Auth::user()->name, "", $post->post);
-                                                    @endphp
-                                                @endif
+                                            @foreach ($reversedPosts as $post)
                                                 <li class="list-inline-item mb-1" style="background-color: rgba(240, 240, 240, 0.6); border-radius: 10px; padding: 1px 20px; font-size: 0.8em; color: rgba(0, 0, 0, 0.6);">
                                                     {{ $post->post }}
                                                 </li>

@@ -328,6 +328,7 @@
                 var titleInputValue = document.getElementById('urlModalAdd').querySelector('input[name="title"]');
                 if (urlInputValue && titleInputValue && !titleInputValue.value) {
                     urlInputValue.value = "";
+                    document.getElementById('urlModalAdd').find('.iframely-embed').html(modalContent).hide();
                 }
                 sessionStorage.removeItem('urlInput');
                 return;

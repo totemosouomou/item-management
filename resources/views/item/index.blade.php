@@ -326,10 +326,8 @@
             if (itemId === "Add") {
                 var urlInputValue = document.getElementById('urlModalAdd').querySelector('input[name="url"]');
                 var titleInputValue = document.getElementById('urlModalAdd').querySelector('input[name="title"]');
-                if (urlInputValue && titleInputValue) {
-                    if (!titleInputValue.value) {
-                        urlInputValue.value = "";
-                    }
+                if (urlInputValue && titleInputValue && !titleInputValue.value) {
+                    urlInputValue.value = "";
                 }
                 sessionStorage.removeItem('urlInput');
                 return;
@@ -399,7 +397,6 @@
                 deleteBtnAria.style.display = 'none';
                 deleteBtn.style.display = 'none';
                 deleteSubmitBtn.style.display = 'none';
-
             }
         }
 

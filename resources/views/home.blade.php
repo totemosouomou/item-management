@@ -111,9 +111,11 @@
             // 上位5ユーザーを表示
             const topFiveLabels = abbreviatedLabels.slice(0, 5);
             const topFiveData = data.slice(0, 5);
+            const othersData = data.slice(5).reduce((acc, cur) => acc + cur, 0);
             const topFiveUrls = urls.slice(0, 5);
-            const finalLabels = topFiveLabels;
-            const finalData = topFiveData;
+
+            const finalLabels = [...topFiveLabels, 'その他'];
+            const finalData = [...topFiveData, othersData];
 
             // 合計値の表示要素
             const totalData = data.reduce((acc, cur) => acc + cur, 0);

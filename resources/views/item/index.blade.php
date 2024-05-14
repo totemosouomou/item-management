@@ -326,9 +326,10 @@
             if (itemId === "Add") {
                 var urlInputValue = document.getElementById('urlModalAdd').querySelector('input[name="url"]');
                 var titleInputValue = document.getElementById('urlModalAdd').querySelector('input[name="title"]');
+                var iframelyValue = document.getElementById('urlModalAdd').querySelector('iframely-embed');
                 if (urlInputValue && titleInputValue && !titleInputValue.value) {
                     urlInputValue.value = "";
-                    document.getElementById('urlModalAdd').find('.iframely-embed').hide();
+                    iframelyValue.style.display = "none";
                 }
                 sessionStorage.removeItem('urlInput');
                 return;

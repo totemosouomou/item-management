@@ -84,7 +84,7 @@
                                                     <label for="post" class="form-label-sm text-muted" style="position: relative; top: 15px; left: 8px;">Post</label>
                                                 </div>
                                                 <div class="col-sm-11">
-                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 8px;" id="post" name="post" value="{{ old('post') }}" placeholder="コメントを入力できます">
+                                                    <input type="text" class="form-control mb-2" style="position: relative; top: 8px;" id="post" name="post" placeholder="コメントを入力できます" value="{{ old('post') }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -158,7 +158,7 @@
                                                         <label for="post" class="form-label-sm text-muted" style="position: relative; top: 6px; left: 8px;">Post</label>
                                                     </div>
                                                     <div class="col-sm-11">
-                                                        <input type="text" class="form-control" id="post" name="post" placeholder="記事へコメントしましょう！">
+                                                        <input type="text" class="form-control" id="post" name="post" placeholder="記事へコメントしましょう！" value="{{ old('post') }}">
                                                         <input type="hidden" name="title" value="{{ $item->title }}">
                                                         <input type="hidden" name="url" value="{{ $item->url }}">
                                                         <input type="hidden" name="id" value="{{ $item->id }}">

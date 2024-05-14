@@ -326,10 +326,14 @@
             if (itemId === "Add") {
                 var urlInputValue = document.getElementById('urlModalAdd').querySelector('input[name="url"]');
                 var titleInputValue = document.getElementById('urlModalAdd').querySelector('input[name="title"]');
-                if (urlInputValue && titleInputValue && !titleInputValue.value) {
+                var postInputValue = document.getElementById('urlModalAdd').querySelector('input[name="post"]');
+
+                // urlのみの状態で閉じた時
+                if (urlInputValue && titleInputValue && postInputValue && !titleInputValue.value && !postInputValue.value) {
                     urlInputValue.value = "";
-                    document.getElementById('urlModalAdd').querySelector('.iframely-embed').style.display = 'none';
                 }
+
+                document.getElementById('urlModalAdd').querySelector('.iframely-embed').style.display = 'none';
                 sessionStorage.removeItem('urlInput');
                 return;
             }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Traits\PeriodCalculator;
+use App\Models\User;
 use App\Models\Item;
 use App\Models\Post;
 
@@ -37,8 +38,13 @@ class HomeController extends Controller
             return redirect()->route('index');
         }
 
-        // グラフへ渡すユーザーごとの記事の投稿数を取得
-        $itemsPerUser = Item::select('user_id', DB::raw('count(*) as total'))
+        // グラフへ渡す同期ユーザーごとの記事の投稿数を取得
+        $usersWithSameYearMonth = User::whereYear('created_at', Auth::user()->created_at->year)
+            ->whereMonth('created_at', Auth::user()->created_at->month)
+            ->pluck('id');
+
+        $itemsPerUser = Item::whereIn('user_id', $usersWithSameYearMonth)
+            ->select('user_id', DB::raw('count(*) as total'))
             ->groupBy('user_id')
             ->with('user')
             ->get();

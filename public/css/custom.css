@@ -117,6 +117,21 @@
   margin-bottom: -15px;
 }
 
+#totalElement {
+  position: relative;
+  bottom: 78%;
+  margin-left: 64%;
+  text-wrap: nowrap;
+  background-color: white;
+  font-size: 0.8em;
+  color: rgba(33, 37, 41, 0.8);
+  padding: 1px 16px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
 .urls, .posts {
   margin-left: 16px;
 }
@@ -206,6 +221,11 @@
 
 /* 600px以下の場合に表示 */
 @media (max-width: 600px) {
+  #totalElement {
+    bottom: 70%;
+    margin-left: 39%;
+  }
+
   .edit-form {
     text-wrap: nowrap;
   }

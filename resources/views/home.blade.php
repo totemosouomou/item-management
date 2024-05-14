@@ -40,6 +40,7 @@
                     <div class="d-flex justify-content-between" style="width: 100%;">
                         <figure class="myChart-responsive" style="width: 70%;">
                             <canvas id="myChart"></canvas>
+                            <div id="totalElement"></div>
                         </figure>
                         @if($randomItem)
                             <div class="iframely-embed iframely-embed-responsive" style="position: relative; top: 10px; width: calc(30% - 10px);">
@@ -103,25 +104,28 @@
             const itemsPerUser = @json($itemsPerUser);
             const sortedItems = itemsPerUser.sort((a, b) => b.total - a.total);
             const labels = sortedItems.map(item => item.user.name);
-            const abbreviatedLabels = labels.map(label => label.length > 8 ? label.slice(0, 8) + '...' : label);
+            const abbreviatedLabels = labels.map(label => label.length > 12 ? label.slice(0, 12) + '' : label);
             const data = sortedItems.map(item => item.total);
             const urls = sortedItems.map(item => `/items/user/${item.user.id}`);
 
-            // 上位5ユーザーとその他のデータを分ける
+            // 上位5ユーザーを表示
             const topFiveLabels = abbreviatedLabels.slice(0, 5);
             const topFiveData = data.slice(0, 5);
-            const othersData = data.slice(5).reduce((acc, cur) => acc + cur, 0);
             const topFiveUrls = urls.slice(0, 5);
+            const finalLabels = topFiveLabels;
+            const finalData = topFiveData;
 
-            const finalLabels = [...topFiveLabels, 'その他'];
-            const finalData = [...topFiveData, othersData];
+            // 合計値の表示要素
+            const totalData = data.reduce((acc, cur) => acc + cur, 0);
+            const totalElement = document.getElementById('totalElement');
+            totalElement.textContent = `{{ Auth::user()->created_at->month }}月入校者みんなの合計: ${totalData} 件`;
 
             const myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: finalLabels,
                     datasets: [{
-                        label: '記事点数 / 1アカウントあたり',
+                        label: `記事点数 / 1ユーザーあたり（{{ Auth::user()->created_at->month }}月）`,
                         data: finalData,
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',

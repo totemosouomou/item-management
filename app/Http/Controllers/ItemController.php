@@ -273,7 +273,13 @@ class ItemController extends Controller
 
             // コメント更新
             if ($postChanged) {
+
+                // 入力データをサニタイズ
                 $securePost = $this->secure($request->input('post'));
+
+                // バリデーションを実行
+                $request->merge([$securePost]);
+                $request->validate($this->validationRules(), $this->validationMessages());
 
                 if ($postBeforeUpdate) {
                     if ($request->post) {

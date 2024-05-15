@@ -36,6 +36,26 @@ class ItemController extends Controller
     }
 
     /**
+     * タイトルに使用できる最大文字数を返す
+     *
+     * @return int
+     */
+    private function title(): int
+    {
+        return 100;
+    }
+
+    /**
+     * コメントに使用できる最大文字数を返す
+     *
+     * @return int
+     */
+    private function comme(): int
+    {
+        return 200;
+    }
+
+    /**
      * バリデーションルールの定義
      *
      * @return array
@@ -44,8 +64,8 @@ class ItemController extends Controller
     {
         return [
             'url' => 'required|url|starts_with:http,https',
-            'title' => 'required|string|max:100',
-            'post' => 'nullable|string|max:200',
+            'title' => 'required|string|max_mb_str:' . $this->title(),
+            'post' => 'nullable|string|max_mb_str:'. $this->comme(),
         ];
     }
 
@@ -62,9 +82,9 @@ class ItemController extends Controller
             'url.starts_with' => '有効なHTTPまたはHTTPSのURLを入力してください。',
             'title.required' => 'タイトルは必須項目です。',
             'title.string' => 'タイトルは文字列で入力してください。',
-            'title.max' => 'タイトルは100文字以内で入力してください。',
+            'title.max_mb_str' => 'タイトルは' . $this->title() . '文字以内で入力してください。',
             'post.string' => 'コメントは文字列で入力してください。',
-            'post.max' => 'コメントは200文字以内で入力してください。',
+            'post.max_mb_str' => 'コメントは' . $this->comme() . '文字以内で入力してください。',
         ];
     }
 
@@ -157,6 +177,22 @@ class ItemController extends Controller
             // バリデーションを実行
             $request->validate($this->validationRules(), $this->validationMessages());
 
+            // 入力データをサニタイズ
+            $secureTitle = $this->secure($request->input('title'));
+            $secureUrl = $this->secure($request->input('url'));
+            $securePost = $this->secure($request->input('post'));
+
+            // サニタイズ後のデータの文字数をチェック
+            if (mb_strlen($secureTitle) > $this->title() || mb_strlen($securePost) > $this->comme()) {
+                return back()->with('error', '特殊文字が多いため登録できませんでした。');
+            }
+
+            $request->merge([
+                'title' => $secureTitle,
+                'url' => $secureUrl,
+                'post' => $securePost,
+            ]);
+
             // リクエストの値を period に再代入する
             if ($request->has('period')) {
                 $period = $request->input('period');
@@ -165,18 +201,17 @@ class ItemController extends Controller
             // 記事登録
             $item = Item::create([
                 'user_id' => Auth::user()->id,
-                'title' => mb_strimwidth($this->secure($request->input('title')), 0, 100, ''),
-                'url' => $this->secure($request->input('url')),
+                'title' => $secureTitle,
+                'url' => $secureUrl,
                 'stage' => $period,
             ]);
 
             // コメント登録
-            $post = mb_strimwidth($this->secure($request->input('post')), 0, 200, '');
-            if (!empty($post)) { // コメントが空でない場合のみ登録
+            if ($securePost) {
                 Post::create([
                     'user_id' => Auth::id(),
                     'item_id' => $item->id,
-                    'post' => $post . " by " . Auth::user()->name,
+                    'post' => $securePost . " by " . Auth::user()->name,
                 ]);
             }
 
@@ -208,39 +243,58 @@ class ItemController extends Controller
             $itemChanged = $item->title !== $request->title || $item->url !== $request->url;
             $postChanged = (!$postBeforeUpdate && $request->post) || ($postBeforeUpdate && $request->post !== $postBeforeUpdateComment);
 
-            // 記事に変更がある場合
-            if ($itemChanged || $postChanged) {
+            // 更新データを準備
+            $updateData = [];
+
+            // 記事更新
+            if ($itemChanged) {
+
+                // 入力データをサニタイズ
+                if ($item->title !== $request->title) {
+                    $secureTitle = $this->secure($request->input('title'));
+                    $updateData['title'] = $secureTitle;
+                }
+                if ($item->url !== $request->url) {
+                    $secureUrl = $this->secure($request->input('url'));
+                    $updateData['url'] = $secureUrl;
+                }
 
                 // バリデーションを実行
+                $request->merge($updateData);
                 $request->validate($this->validationRules(), $this->validationMessages());
 
-                // 記事更新
-                Item::where('id', $request->id)->update([
-                    'title' => mb_strimwidth($this->secure($request->input('title')), 0, 100, ''),
-                    'url' => $this->secure($request->url),
-                ]);
+                // 必要なフィールドのみ更新
+                if (!empty($updateData)) {
+                    $item->update($updateData);
+                }
+            }
 
-                // コメント更新
+            // コメント更新
+            if ($postChanged) {
+                $securePost = $this->secure($request->input('post'));
+
                 if ($postBeforeUpdate) {
                     if ($request->post) {
                         $postBeforeUpdate->update([
-                            'post' => mb_strimwidth($this->secure($request->input('post')), 0, 200, '') . " by " . Auth::user()->name,
+                            'post' => $securePost . " by " . Auth::user()->name,
                         ]);
                     } else {
                         $postBeforeUpdate->delete();
                     }
-                } elseif ($request->post) {
+                } elseif ($securePost) {
                     Post::create([
                         'user_id' => Auth::id(),
                         'item_id' => $request->id,
-                        'post' => mb_strimwidth($this->secure($request->input('post')), 0, 200, '') . " by " . Auth::user()->name,
+                        'post' => $securePost . " by " . Auth::user()->name,
                     ]);
                 }
+            }
 
+            if ($itemChanged || $postChanged) {
                 return back()->with('success', '記事が更新されました。');
-
-            // 変更がない場合はback
             } else {
+
+                // 変更がない場合はback
                 return back()->with('success', '記事の更新はありません。');
             }
         }

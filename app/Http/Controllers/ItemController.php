@@ -64,8 +64,8 @@ class ItemController extends Controller
     {
         return [
             'url' => 'required|url|starts_with:http,https',
-            'title' => 'required|string|max_mb_str:' . $this->title(),
-            'post' => 'nullable|string|max_mb_str:'. $this->comme(),
+            'title' => 'required|string|max_mb_str:' . $this->title() . '|ng_words',
+            'post' => 'nullable|string|max_mb_str:' . $this->comme() . '|ng_words',
         ];
     }
 
@@ -83,8 +83,10 @@ class ItemController extends Controller
             'title.required' => 'タイトルは必須項目です。',
             'title.string' => 'タイトルは文字列で入力してください。',
             'title.max_mb_str' => 'タイトルは' . $this->title() . '文字以内で入力してください。',
+            'title.ng_words' => 'タイトルに相手を傷つける表現は含まれていませんか？',
             'post.string' => 'コメントは文字列で入力してください。',
             'post.max_mb_str' => 'コメントは' . $this->comme() . '文字以内で入力してください。',
+            'post.ng_words' => 'コメントに相手を傷つける表現は含まれていませんか？',
         ];
     }
 

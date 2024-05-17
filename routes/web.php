@@ -19,10 +19,6 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
-Route::get('/webauth.html', function () {
-    return view('webauth');
-});
-
 Route::match(['get', 'post'], '/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::prefix('items')->group(function () {

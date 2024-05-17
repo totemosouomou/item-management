@@ -10,7 +10,7 @@
                                     border-radius: 10px;
                             ">
                                 @if (is_array($article) && isset($article['url']) && isset($article['title']))
-                                    <a href="#" onclick="event.preventDefault(); window.open('{{ $article['url'] }}'); window.location.href = '/items/add/{{ $article['url'] }}';">{{ $article['title'] }}</a>
+                                    <a href="#" onclick="event.preventDefault(); window.open('{{ $article['url'] }}'); window.location.href = '{{ url('items/add/' . $article['url']) }}';">{{ $article['title'] }}</a>
                                 @endif
                             </li>
                         @endforeach

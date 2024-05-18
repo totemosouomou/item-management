@@ -42,7 +42,7 @@
                     @if(session()->has('requestSearch'))
                         <div class="d-flex">
                             @foreach(session('requestSearch') as $searchWord)
-                                <form method="post" action="">
+                                <form method="post" action="{{ url()->current(['page' => null]) }}">
                                     @csrf
                                     <input type="hidden" name="clear" value="{{ $searchWord }}">
                                     <button class="btn btn-outline-secondary mr-2" type="submit">
@@ -249,7 +249,7 @@
                 <!-- ページネーション -->
                 @if ($items->hasPages())
                     <div class="card-footer clearfix pb-0">
-                        {{ $items->appends(['search' => session('requestSearch')])->links() }}
+                        {{ $items->appends(['search' => implode(' ', session('requestSearch'))])->links() }}
                     </div>
                 @endif
             </div>

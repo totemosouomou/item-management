@@ -106,7 +106,7 @@
             const labels = sortedItems.map(item => item.user.name);
             const abbreviatedLabels = labels.map(label => label.length > 12 ? label.slice(0, 12) + '' : label);
             const data = sortedItems.map(item => item.total);
-            const urls = sortedItems.map(item => `/items/user/${item.user.id}`);
+            const urls = sortedItems.map(item => `{{ url('items/user') }}/${item.user.id}`);
 
             // 上位5ユーザーを表示
             const topFiveLabels = abbreviatedLabels.slice(0, 5);

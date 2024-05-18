@@ -249,7 +249,7 @@
                 <!-- ページネーション -->
                 @if ($items->hasPages())
                     <div class="card-footer clearfix pb-0">
-                        {{ $items->appends(['search' => implode(' ', session('requestSearch'))])->links() }}
+                        {{ $items->appends(['search' => implode(' ', session('requestSearch', []))])->links() }}
                     </div>
                 @endif
             </div>

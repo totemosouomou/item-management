@@ -112,14 +112,33 @@ class ItemController extends Controller
     public function index(Request $request, $user_id = null)
     {
         // 検索機能
-        if ($request->clear) {
-            $requestSearch = "";
-        } elseif ($request->input('search')) {
-            $requestSearch = $request->input('search');
+        if ($request->filled('search')) {
+            $requestSearch = explode(' ', $request->input('search'));
         } else {
-            $requestSearch = $request->session()->get('requestSearch', '');
+            $requestSearch = $request->session()->get('requestSearch', []);
+            if (!is_array($requestSearch)) {
+                $requestSearch = explode(' ', $requestSearch);
+            }
+
+            // clear機能
+            if ($request->filled('clear')) {
+                $clearValue = $request->input('clear');
+                $requestSearch = array_values(array_diff($requestSearch, [$clearValue]));
+            }
         }
-        $request->session()->put('requestSearch', $requestSearch);
+        if (session()->has('requestSearch')) {
+            $request->session()->put('requestSearch', $requestSearch);
+        }
+
+        // クエリビルダーの初期化
+        $query = Item::with('posts');
+
+        // 各検索ワードに対して条件を追加
+        foreach ($requestSearch as $word) {
+            if (!empty($word)) {
+                $query->where('title', 'like', '%' . $this->secure($word) . '%');
+            }
+        }
 
         // ユーザーIDが指定されている場合の処理
         if ($user_id == "admin") {
@@ -146,12 +165,13 @@ class ItemController extends Controller
 
         if ($user_id) {
             $title_name = $user->name . "さんの記事";
-            $items = Item::with('posts')->where('user_id', $user_id)->where('title', 'like', '%' . $this->secure($requestSearch) . '%')->orderBy('created_at', 'desc')->paginate($this->pagination());
+            $query->where('user_id', $user_id);
         } elseif ($title_name !== '全記事') {
-            $items = Item::with('posts')->where('stage', $stage)->where('title', 'like', '%' . $this->secure($requestSearch) . '%')->orderBy('created_at', 'desc')->paginate($this->pagination());
-        } else {
-            $items = Item::with('posts')->where('title', 'like', '%' . $this->secure($requestSearch) . '%')->orderBy('created_at', 'desc')->paginate($this->pagination());
+            $query->where('stage', $stage);
         }
+
+        // クエリの実行
+        $items = $query->orderBy('created_at', 'desc')->paginate($this->pagination());
 
         // Trait内のメソッドを呼び出し、ユーザーのステージを取得
         $period = $this->getPeriodFromCreationDate();

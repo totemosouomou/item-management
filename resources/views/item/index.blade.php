@@ -39,15 +39,19 @@
                     </div>
                 </div>
                 <div class="card-body">
-                @if(session('requestSearch'))
-                    <form method="post" action="">
-                        @csrf
-                        <input type="hidden" name="clear" value="clear">
-                        <button class="btn btn-outline-secondary" type="submit">
-                            {{ session('requestSearch') }}　&times;
-                        </button>
-                    </form>
-                @endif
+                    @if(session()->has('requestSearch'))
+                        <div class="d-flex">
+                            @foreach(session('requestSearch') as $searchWord)
+                                <form method="post" action="">
+                                    @csrf
+                                    <input type="hidden" name="clear" value="{{ $searchWord }}">
+                                    <button class="btn btn-outline-secondary mr-2" type="submit">
+                                        {{ $searchWord }} &times;
+                                    </button>
+                                </form>
+                            @endforeach
+                        </div>
+                    @endif
                     <div class="d-flex flex-wrap">
 
                         <!-- add表示用のモーダル -->

@@ -62,6 +62,7 @@ class HomeController extends Controller
             ->select('user_id', DB::raw('count(*) as total'))
             ->groupBy('user_id')
             ->with('user')
+            ->where('stage', '!=', 'inactive')
             ->get();
 
         // コメント一覧を取得

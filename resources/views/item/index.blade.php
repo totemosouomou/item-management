@@ -218,7 +218,7 @@
                                             <!-- ブログカード表示 -->
                                             <div class="iframely-embed" style="display: none;"></div>
 
-                                            <!-- 編集・削除ボタン -->
+                                            <!-- 編集・削除・通報ボタン -->
                                             <div class="d-flex" style="height: 2.4em;">
                                                 <div id="editBtn_{{ $item->id }}" class="edit-form m-2 mr-4">
                                                     <p class="btn rounded-pill btn-size mirror-btn" onclick="editItem('{{ $item->id }}');">編集</p>
@@ -231,6 +231,10 @@
                                                             <p id="delete-btn_{{ $item->id }}" class="btn btn-outline-danger rounded-pill btn-size delete-btn" onclick="deleteItem('{{ $item->id }}');">削除</p>
                                                             <button id="delete-Submit_{{ $item->id }}" class="btn btn-danger rounded-pill btn-size" style="display: none; position: relative; left: 75px;">削除を実行するボタン</button>
                                                         </form>
+                                                    </div>
+                                                @else
+                                                    <div class="" style="position: absolute; right: 15px; bottom: 10px;">
+                                                        <button class="flag-btn ml-2" onclick="flagItem(this, '{{ $item->id }}', '{{ $item->stage }}');">通報</button>
                                                     </div>
                                                 @endif
                                             </div>
@@ -325,6 +329,31 @@
                     }
                 });
             }
+        }
+
+        // 記事詳細画面で、通報ボタンを処理するスクリプト
+        function flagItem(button, itemId, itemStage) {
+            $.ajax({
+                url: '{{ url('items/flag') }}',
+                type: 'post',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    item_id: itemId,
+                    stage: itemStage,
+                },
+                success: function(response) {
+                    if (response.status === 'flag_added') {
+                        console.log('Flag added!');
+                        button.classList.add('active');
+                    } else if (response.status === 'flag_removed') {
+                        console.log('Flag removed!');
+                        button.classList.remove('active');
+                    }
+                },
+                error: function(xhr) {
+                    alert('エラーが発生し処理が完了しませんでした。');
+                }
+            });
         }
 
         // モーダルが閉じたときのイベントを検知するためのスクリプト

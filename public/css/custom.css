@@ -48,6 +48,25 @@
   color: #fff;
 }
 
+.flag-btn {
+  background-color: rgba(240, 240, 240, 0.6);
+  border-radius: 10px;
+  padding: 1px 20px;
+  font-size: 0.8em;
+  color: rgba(0, 0, 0, 0.6);
+  border: 0px;
+}
+
+.flag-btn.active {
+  background-color: rgba(220, 53, 69, 0.8);
+  color: #fff;
+}
+
+.flag-btn:hover {
+  background-color: rgba(220, 53, 69, 0.8);
+  color: #fff;
+}
+
 .nav-link.active {
   background-color: #00ABAE !important;
 }

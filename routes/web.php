@@ -39,4 +39,5 @@ Route::prefix('items')->group(function () {
     Route::match(['get', 'post'], '/add/{urlInput?}', [App\Http\Controllers\ItemController::class, 'add'])->where('urlInput', '(.*)');
     Route::match(['get', 'post'], '/update', [App\Http\Controllers\ItemController::class, 'update']);
     Route::match(['get', 'post'], '/delete', [App\Http\Controllers\ItemController::class, 'delete']);
+    Route::match(['get', 'post'], '/flag', [App\Http\Controllers\ItemController::class, 'flagItem']);
 });

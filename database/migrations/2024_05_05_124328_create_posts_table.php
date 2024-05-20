@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->index()->name('posts_user_id_foreign');
-            $table->foreignId('item_id')->constrained()->index()->name('posts_item_id_foreign');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade')->name('posts_user_id_foreign');
+            $table->foreignId('item_id')->constrained()->onDelete('cascade')->name('posts_item_id_foreign');
             $table->string('post', 255)->nullable();  // by user_nameを含むためバリデーションの数値を相違
             $table->timestamps();
         });

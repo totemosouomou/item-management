@@ -10,6 +10,7 @@ use App\Http\Controllers\Traits\ArticleController;
 use App\Models\User;
 use App\Models\Item;
 use App\Models\Post;
+use App\Models\Flag;
 
 class ItemController extends Controller
 {
@@ -114,27 +115,31 @@ class ItemController extends Controller
         // 検索機能
         if ($request->filled('search')) {
             $requestSearch = explode(' ', $request->input('search'));
+
+            // 空文字を含む場合は取り除く
+            $requestSearch = array_filter($requestSearch, fn($value) => $value !== "");
+
+            // セッションに保存
+            $request->session()->put('requestSearch', $requestSearch);
+
         } else {
             $requestSearch = $request->session()->get('requestSearch', []);
 
-            // セッションから取得した値が配列でない場合に配列に変換
+            // 配列でない場合に配列へ変換
             if (!is_array($requestSearch)) {
                 $requestSearch = explode(' ', $requestSearch);
             }
+
+            // 空文字を含む場合は取り除く
+            $requestSearch = array_filter($requestSearch, fn($value) => $value !== "");
 
             // clear機能
             if ($request->filled('clear')) {
                 $clearValue = $request->input('clear');
                 $requestSearch = array_values(array_diff($requestSearch, [$clearValue]));
             }
-        }
 
-        // セッションに保存する前に配列であることを確認
-        if (!is_array($requestSearch)) {
-            $requestSearch = explode(' ', $requestSearch);
-        }
-
-        if (session()->has('requestSearch')) {
+            // セッションに保存
             $request->session()->put('requestSearch', $requestSearch);
         }
 
@@ -150,7 +155,7 @@ class ItemController extends Controller
 
         // ユーザーIDが指定されている場合の処理
         if ($user_id == "admin") {
-            return redirect()->route('user', ['user_id' => auth()->id()]);
+            return redirect()->route('user', ['user_id' => Auth::user()->id]);
         }
 
         if ($user_id) {
@@ -178,8 +183,11 @@ class ItemController extends Controller
             $query->where('stage', $stage);
         }
 
+        // ユーザーがフラグをつけたレコードを取得
+        $flaggedItemIds = Flag::where('user_id', Auth::user()->id)->pluck('item_id')->toArray();
+
         // クエリの実行
-        $items = $query->orderBy('created_at', 'desc')->paginate($this->pagination());
+        $items = $query->where('stage', '!=', 'inactive')->whereNotIn('id', $flaggedItemIds)->orderBy('created_at', 'desc')->paginate($this->pagination());
 
         // Trait内のメソッドを呼び出し、ユーザーのステージを取得
         $period = $this->getPeriodFromCreationDate();
@@ -366,5 +374,62 @@ class ItemController extends Controller
         }
 
         return redirect('/items')->with('error', '指定された記事が見つかりませんでした。');
+    }
+
+    /**
+     * 記事への通報（フラグを付けたり削除したりする）
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function flagItem(Request $request)
+{
+        // POSTリクエストのとき
+        if ($request->isMethod('post')) {
+
+            // ユーザー情報を取得
+            $user = Auth::user();
+
+            // アイテムIDを取得
+            $itemId = $request->input('item_id');
+
+            // ユーザーが既にこのアイテムにフラグを付けているか確認
+            $flag = Flag::where('user_id', $user->id)->where('item_id', $itemId)->first();
+
+            // 既にフラグが付いている場合、そのフラグを削除
+            if ($flag) {
+
+                // このアイテムに対するフラグの総数をカウント
+                $flagCount = Flag::where('item_id', $itemId)->count();
+
+                // 3つ以上になった場合、アイテムのステージを更新
+                if ($flagCount >= 3) {
+                    Item::where('id', $itemId)->update(['stage' => $request->input('stage')]);
+                }
+
+                $flag->delete();
+                return response()->json(['status' => '通報を取り消しました。']);
+
+            // フラグが付いていない場合、新しいフラグを作成
+            } else {
+                Flag::create([
+                    'user_id' => $user->id,
+                    'item_id' => $itemId,
+                    'flag' => now(),
+                ]);
+
+                // このアイテムに対するフラグの総数をカウント
+                $flagCount = Flag::where('item_id', $itemId)->count();
+
+                // 3つ以上になった場合、アイテムを inactive に更新
+                if ($flagCount >= 3) {
+                    Item::where('id', $itemId)->update(['stage' => 'inactive']);
+                }
+
+                return response()->json(['status' => '通報処理が完了しました。']);
+            }
+        }
+
+        return abort(404)->with('error', 'エラーが発生し処理が完了しませんでした。');
     }
 }

@@ -23,6 +23,14 @@ class Item extends Model
     }
 
     /**
+     * このアイテムに関連するフラッグを取得
+     */
+    public function flags()
+    {
+        return $this->hasMany(Flag::class);
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>

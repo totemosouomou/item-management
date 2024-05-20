@@ -9,14 +9,13 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('items', function (Blueprint $table) {
+        Schema::create('flags', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade')->name('items_user_id_foreign');
-            $table->string('title', 100)->index();
-            $table->text('url');
-            $table->string('stage', 100);
+            $table->foreignId('user_id')->constrained()->onDelete('cascade')->name('flags_user_id_foreign');
+            $table->foreignId('item_id')->constrained()->onDelete('cascade')->name('flags_item_id_foreign');
+            $table->timestamp('flag')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('items');
+        Schema::dropIfExists('flags');
     }
 };

@@ -342,11 +342,9 @@
                     stage: itemStage,
                 },
                 success: function(response) {
-                    if (response.status === 'flag_added') {
-                        console.log('Flag added!');
+                    if (response.status === '通報処理が完了しました。') {
                         button.classList.add('active');
-                    } else if (response.status === 'flag_removed') {
-                        console.log('Flag removed!');
+                    } else if (response.status === '通報を取り消しました。') {
                         button.classList.remove('active');
                     }
                 },

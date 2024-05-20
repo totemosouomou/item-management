@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Traits\PeriodCalculator;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Item;
 use App\Models\Post;
@@ -38,9 +39,23 @@ class HomeController extends Controller
             return redirect()->route('index');
         }
 
+        // ユーザー情報を取得
+        $user = Auth::user();
+
+        // 入校日が存在する場合、それを使用
+        if ($user->date_of_enrollment) {
+            $enrollmentColumn = "date_of_enrollment";
+            $enrollmentDate = Carbon::parse($user->date_of_enrollment);
+        } else {
+            $enrollmentColumn = "created_at";
+            $enrollmentDate = Carbon::parse($user->created_at);
+        }
+
         // グラフへ渡す同期ユーザーごとの記事の投稿数を取得
-        $usersWithSameYearMonth = User::whereYear('created_at', Auth::user()->created_at->year)
-            ->whereMonth('created_at', Auth::user()->created_at->month)
+        $month = $enrollmentDate->month;
+
+        $usersWithSameYearMonth = User::whereYear($enrollmentColumn, $enrollmentDate->year)
+            ->whereMonth($enrollmentColumn, $month)
             ->pluck('id');
 
         $itemsPerUser = Item::whereIn('user_id', $usersWithSameYearMonth)
@@ -49,13 +64,14 @@ class HomeController extends Controller
             ->with('user')
             ->get();
 
+        // コメント一覧を取得
         $posts = Post::orderBy('created_at', 'desc')->take(30)->get();
 
         // Trait内のメソッドを呼び出し、ユーザーのステージを取得
         $period = $this->getPeriodFromCreationDate();
         $randomItem = $this->getRandomItemByPeriod($period);
 
-        return view('home', compact('itemsPerUser', 'posts', 'randomItem'));
+        return view('home', compact('month', 'itemsPerUser', 'posts', 'randomItem'));
     }
 
     /**

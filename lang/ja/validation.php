@@ -172,6 +172,7 @@ return [
         'customer'                 => 'お客様',
         'date'                     => '日付',
         'date_of_birth'            => '生年月日',
+        'Date of Enrollment'       => '入校日',
         'dates'                    => '日付',
         'day'                      => '日',
         'deleted_at'               => '削除日',

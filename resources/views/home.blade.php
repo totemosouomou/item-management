@@ -120,14 +120,14 @@
             // 合計値の表示要素
             const totalData = data.reduce((acc, cur) => acc + cur, 0);
             const totalElement = document.getElementById('totalElement');
-            totalElement.textContent = `{{ Auth::user()->created_at->month }}月入校者みんなの合計: ${totalData} 件`;
+            totalElement.textContent = `{{ $month }}月入校者みんなの合計: ${totalData} 件`;
 
             const myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: finalLabels,
                     datasets: [{
-                        label: `記事点数 / 1ユーザーあたり（{{ Auth::user()->created_at->month }}月）`,
+                        label: `記事点数 / 1ユーザーあたり（{{ $month }}月）`,
                         data: finalData,
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',

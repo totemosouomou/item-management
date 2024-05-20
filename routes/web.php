@@ -16,6 +16,10 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+Route::get('register/{token?}', [App\Http\Controllers\Auth\RegisterController::class, 'showRegistrationForm'])->where('token', '(.*)');
+Route::post('register/{token?}', [App\Http\Controllers\Auth\RegisterController::class, 'register'])->where('token', '(.*)')->name('register.token');
+Route::get('/users/add', [App\Http\Controllers\UserController::class, 'create']);
+Route::match(['get', 'post'], '/users/store', [App\Http\Controllers\UserController::class, 'store']);
 
 Auth::routes();
 

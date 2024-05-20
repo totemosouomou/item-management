@@ -240,19 +240,20 @@
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
-                        @else
-                            <p>No articles found.</p>
-                        @endif
+                            @endforeach
+                            @else
+                                <p>No articles found.</p>
+                            @endif
+                        </div>
                     </div>
+
+                    <!-- ページネーション -->
+                    @if ($items->hasPages())
+                        <div class="card-footer clearfix pb-0">
+                            {{ $items->appends(['search' => implode(' ', session('requestSearch', []))])->links() }}
+                        </div>
+                    @endif
                 </div>
-                <!-- ページネーション -->
-                @if ($items->hasPages())
-                    <div class="card-footer clearfix pb-0">
-                        {{ $items->appends(['search' => implode(' ', session('requestSearch', []))])->links() }}
-                    </div>
-                @endif
-            </div>
 
                 <!-- Qitta記事をapiで取得 -->
                 @include('item.articles')

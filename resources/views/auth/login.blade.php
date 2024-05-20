@@ -8,7 +8,7 @@
                 <div class="card-header">{{ __('Login') }}</div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('login') }}">
+                    <form method="post" action="{{ route('login') }}">
                         @csrf
 
                         <div class="row mb-3">
@@ -53,7 +53,7 @@
 
                         <div class="row mb-0">
                             <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary login-page" onmouseover="this.style.backgroundColor='#00abae'; this.style.color='#fff';">
+                                <button type="submit" class="btn btn-primary login-page" onmouseover="this.style.backgroundColor='rgba(0, 171, 174, 0.8)'; this.style.color='#fff';" onmouseout="this.style.backgroundColor='#00abae';">
                                     {{ __('Login') }}
                                 </button>
 

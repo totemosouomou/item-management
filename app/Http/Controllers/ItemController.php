@@ -116,6 +116,8 @@ class ItemController extends Controller
             $requestSearch = explode(' ', $request->input('search'));
         } else {
             $requestSearch = $request->session()->get('requestSearch', []);
+
+            // セッションから取得した値が配列でない場合に配列に変換
             if (!is_array($requestSearch)) {
                 $requestSearch = explode(' ', $requestSearch);
             }
@@ -126,6 +128,12 @@ class ItemController extends Controller
                 $requestSearch = array_values(array_diff($requestSearch, [$clearValue]));
             }
         }
+
+        // セッションに保存する前に配列であることを確認
+        if (!is_array($requestSearch)) {
+            $requestSearch = explode(' ', $requestSearch);
+        }
+
         if (session()->has('requestSearch')) {
             $request->session()->put('requestSearch', $requestSearch);
         }

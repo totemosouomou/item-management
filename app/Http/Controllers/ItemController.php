@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\PeriodCalculator;
 use App\Http\Controllers\Traits\ArticleController;
@@ -11,6 +12,7 @@ use App\Models\User;
 use App\Models\Item;
 use App\Models\Post;
 use App\Models\Flag;
+use App\Models\Bookmark;
 
 class ItemController extends Controller
 {
@@ -31,9 +33,9 @@ class ItemController extends Controller
      *
      * @return int
      */
-    private function pagination(): int
+    private function pagination($user_id): int
     {
-        return 10;
+        return $user_id == Auth::id() ? 50 : 10;
     }
 
     /**
@@ -112,6 +114,17 @@ class ItemController extends Controller
      */
     public function index(Request $request, $user_id = null)
     {
+        // ユーザーIDが指定されている場合のリダイレクト処理
+        if ($user_id) {
+            if ($user_id == "admin") {
+                return redirect()->route('user', ['user_id' => Auth::id()]);
+            }
+            $user = User::find($user_id);
+            if (!$user) {
+                return redirect('/items')->with('error', '指定されたユーザーが見つかりませんでした。');
+            }
+        }
+
         // 検索機能
         if ($request->filled('search')) {
             $requestSearch = explode(' ', $request->input('search'));
@@ -144,24 +157,12 @@ class ItemController extends Controller
         }
 
         // クエリビルダーの初期化
-        $query = Item::with('posts');
+        $query = Item::with('posts')->with('bookmarks');
 
         // 各検索ワードに対して条件を追加
         foreach ($requestSearch as $word) {
             if (!empty($word)) {
                 $query->where('title', 'like', '%' . $this->secure($word) . '%');
-            }
-        }
-
-        // ユーザーIDが指定されている場合の処理
-        if ($user_id == "admin") {
-            return redirect()->route('user', ['user_id' => Auth::user()->id]);
-        }
-
-        if ($user_id) {
-            $user = User::find($user_id);
-            if (!$user) {
-                return redirect('/items')->with('error', '指定されたユーザーが見つかりませんでした。');
             }
         }
 
@@ -184,16 +185,21 @@ class ItemController extends Controller
         }
 
         // ユーザーがフラグをつけたレコードを取得
-        $flaggedItemIds = Flag::where('user_id', Auth::user()->id)->pluck('item_id')->toArray();
+        $flaggedItemIds = Flag::where('user_id', Auth::id())->pluck('item_id')->toArray();
 
         // クエリの実行
-        $items = $query->where('stage', '!=', 'inactive')->whereNotIn('id', $flaggedItemIds)->orderBy('created_at', 'desc')->paginate($this->pagination());
+        $items = $query->where('stage', '!=', 'inactive')->whereNotIn('id', $flaggedItemIds)->orderBy('created_at', 'desc')->paginate($this->pagination($user_id));
 
         // Trait内のメソッドを呼び出し、ユーザーのステージを取得
         $period = $this->getPeriodFromCreationDate();
 
         // Trait内のメソッドを呼び出し、指定された検索語に基づくQiitaの記事を取得
         $articles = $this->getQiitaArticles($requestSearch);
+
+        // ユーザーIDが指定されている場合の処理
+        if ($user_id && $user == Auth::user()) {
+            return view('item.bookmark', compact('stage', 'titleNames', 'items', 'title_name', 'period', 'articles'))->with('requestSearch', $requestSearch)->with('urlInput', session('urlInput'));
+        }
 
         return view('item.index', compact('stage', 'titleNames', 'items', 'title_name', 'period', 'articles'))->with('requestSearch', $requestSearch)->with('urlInput', session('urlInput'));
     }
@@ -238,7 +244,7 @@ class ItemController extends Controller
 
             // 記事登録
             $item = Item::create([
-                'user_id' => Auth::user()->id,
+                'user_id' => Auth::id(),
                 'title' => $secureTitle,
                 'url' => $secureUrl,
                 'stage' => $period,
@@ -383,18 +389,15 @@ class ItemController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function flagItem(Request $request)
-{
+    {
         // POSTリクエストのとき
         if ($request->isMethod('post')) {
-
-            // ユーザー情報を取得
-            $user = Auth::user();
 
             // アイテムIDを取得
             $itemId = $request->input('item_id');
 
             // ユーザーが既にこのアイテムにフラグを付けているか確認
-            $flag = Flag::where('user_id', $user->id)->where('item_id', $itemId)->first();
+            $flag = Flag::where('user_id', Auth::id())->where('item_id', $itemId)->first();
 
             // 既にフラグが付いている場合、そのフラグを削除
             if ($flag) {
@@ -413,7 +416,7 @@ class ItemController extends Controller
             // フラグが付いていない場合、新しいフラグを作成
             } else {
                 Flag::create([
-                    'user_id' => $user->id,
+                    'user_id' => Auth::id(),
                     'item_id' => $itemId,
                     'flag' => now(),
                 ]);
@@ -427,6 +430,58 @@ class ItemController extends Controller
                 }
 
                 return response()->json(['status' => '通報処理が完了しました。']);
+            }
+        }
+
+        return abort(404)->with('error', 'エラーが発生し処理が完了しませんでした。');
+    }
+
+    /**
+     * 記事の bookmark（bookmarkを付けたり削除したりする）
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function bookmarkItem(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|file|mimes:jpg,jpeg,png,webp,avif'
+        ]);
+
+        // POSTリクエストのとき
+        if ($request->isMethod('post')) {
+
+            // アイテムIDを取得
+            $itemId = $request->input('item_id');
+
+            // ユーザーが既にこのアイテムに bookmark を付けているか確認
+            $bookmark = Bookmark::where('user_id', Auth::id())->where('item_id', $itemId)->first();
+
+            // 既に bookmark が付いている場合、その bookmark を削除
+            if ($bookmark) {
+                $bookmark->delete();  //　ファイルは削除しない
+                return response()->json(['status' => 'bookmark を取り消しました。']);
+
+            // bookmark が付いていない場合、新しい bookmark を作成
+            } else {
+                $image = $request->file('image');
+                $extension = $image->extension();
+                $filename = $itemId . '.' . $extension;
+
+                // ファイルが存在しない場合のみ保存
+                if (!Storage::disk('public')->exists('bookmarks/' . $filename)) {
+                    $path = $image->storeAs('public/bookmarks', $filename);
+                } else {
+                    $path = 'bookmarks/' . $filename;
+                }
+
+                Bookmark::create([
+                    'user_id' => Auth::id(),
+                    'item_id' => $itemId,
+                    'thumbnail' => $path,
+                ]);
+
+                return response()->json(['status' => 'bookmark 処理が完了しました。']);
             }
         }
 

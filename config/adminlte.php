@@ -318,7 +318,7 @@ return [
         ],
         ['header' => 'アカウント'],
         [
-            'text' => '自分の登録記事',
+            'text' => '投稿 ＆ bookmark',
             'url'  => 'items/user/admin',
             'icon' => 'fas fa-fw fa-user',
         ],

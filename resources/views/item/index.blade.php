@@ -115,7 +115,7 @@
                             </div>
                         </div>
 
-                        @if (!empty($items))
+                        @if (!$items->isEmpty())
                         @foreach ($items as $item)
                             <figure class="m-3 contents" data-toggle="modal" data-target="#urlModal{{ $item->id }}" onClick="openModal(this, '{{ $item->url }}')">
                                 <figcaption class="text-dark font-weight-bold">{{ $item->title }}</figcaption>
@@ -134,10 +134,11 @@
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
-                                        <p class="urls mx-3 my-0">
+                                        <p class="d-flex urls mx-3 my-0">
                                             <a href="{{ $item->url }}" style="text-decoration: none;" id="itemUrl_{{ $item->id }}">
                                                 {{ \Illuminate\Support\Str::limit($item->url, 80, $end='...') }}
                                             </a>
+                                            <span class="ml-2 star" onclick="starClick(this, {{ $item->id }})">☆</span>
                                         </p>
                                         <ul class="posts mx-3 mt-1 mb-0 list-unstyled list-inline" id="itemPost_{{ $item->id }}">
                                             @php
@@ -329,6 +330,45 @@
                     }
                 });
             }
+        }
+
+        // 記事詳細画面で、bookmarkボタンを処理するスクリプト
+        function starClick(button, itemId) {
+            var iframeSrc = $('#urlModal' + itemId).find('iframe').attr('src');
+
+            // サムネイルURLの生成
+            var thumbnailUrl = iframeSrc
+                .replace('/api/iframe?', '/api/thumbnail?')
+                .replace(/&v=1&app=1$/, '')
+                .replace(/&[^&]+$/, '&key={{ config('iframely.api.key') }}&maxwidth=320');
+            console.log(thumbnailUrl);
+
+            fetch(thumbnailUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    var formData = new FormData();
+                    formData.append('image', blob, 'thumbnail.jpg');
+                    formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+                    formData.append('item_id', itemId);
+
+                    $.ajax({
+                        url: '{{ url('items/bookmark') }}',
+                        type: 'post',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status === 'bookmark 処理が完了しました。') {
+                                button.textContent = '★';
+                            } else if (response.status === 'bookmark を取り消しました。') {
+                                button.textContent = '☆';
+                            }
+                        },
+                        error: function(xhr) {
+                            alert('エラーが発生し処理が完了しませんでした。');
+                        }
+                    });
+                });
         }
 
         // 記事詳細画面で、通報ボタンを処理するスクリプト

@@ -180,6 +180,40 @@
   background-color: rgba(0, 171, 174, 0.8);
 }
 
+.bookmarks {
+  transition: transform 0.3s, box-shadow 0.3s;
+  color: rgba(33, 37, 41, 0.8);
+  text-decoration: none;
+}
+
+.bookmarks:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  color: rgba(33, 37, 41, 0.8);
+}
+
+.figure-area {
+  width: 100%;
+}
+
+.text-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  max-width: calc(100% - 105px);
+}
+
+.img-fluid {
+  margin-left: auto;
+  width: 92px;
+  height: 69px;
+  object-fit: cover;
+  border-radius: 10%;
+  position: absolute;
+  right: 12px;
+  bottom: 11px;
+}
+
 .modal-dialog {
   max-width: 800px;
   max-height: 400px;
@@ -258,5 +292,13 @@
   .delete-btn {
     position: relative;
     left: -30px;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .figure-area {
+    margin-left: 0 !important;
   }
 }

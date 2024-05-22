@@ -24,7 +24,6 @@ trait CustomRegistersUsers
      */
     public function showRegistrationForm($token = null)
     {
-        Auth::logout();
         // セッションからエラーメッセージを削除
         Session::forget('error');
 

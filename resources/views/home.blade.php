@@ -73,11 +73,9 @@
                                 @if ($post->user_id == auth()->user()->id)
                                     color: #00abae;
                                     background-color: #ddf2f3;
-                                    border-radius: 10px;
                                 @else
                                     background-color: rgba(250, 250, 250, 0.5);
                                     color: rgba(33, 37, 41, 0.8);
-                                    border-radius: 10px;
                                 @endif
                             ">
                                 {{ $post->post }}

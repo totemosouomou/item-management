@@ -185,7 +185,7 @@ class ItemController extends Controller
 
         // 表示させないアイテムを設定
         $flaggedItemIds = Flag::where('user_id', Auth::id())->pluck('item_id')->toArray();
-        $query->where('stage', '!=', 'inactive'); // ステージがinactiveでない場合の処理
+        $query->where('stage', '!=', 'inactive'); // ステージが inactive でない場合の処理
         $query->whereNotIn('id', $flaggedItemIds); // フラグがつけられたアイテムIDを除外する処理
 
         // クエリの結果を取得
@@ -194,7 +194,7 @@ class ItemController extends Controller
         // Trait 内のメソッドを呼び出し、ユーザーのステージを取得
         $period = $this->getPeriodFromCreationDate();
 
-        // Trait内のメソッドを呼び出し、指定された検索語に基づく Qiita の記事を取得
+        // Trait 内のメソッドを呼び出し、指定された検索語に基づく Qiita の記事を取得
         $articles = $this->getQiitaArticles($requestSearch);
 
         // ユーザーIDが指定されている場合の処理
@@ -213,7 +213,7 @@ class ItemController extends Controller
      */
     public function add(Request $request, $urlInput = null)
     {
-        // Trait内のメソッドを呼び出し、ユーザーのステージを取得
+        // Trait 内のメソッドを呼び出し、ユーザーのステージを取得
         $period = $this->getPeriodFromCreationDate();
 
         // POSTリクエストのとき
@@ -346,9 +346,9 @@ class ItemController extends Controller
 
             if ($itemChanged || $postChanged) {
                 return back()->with('success', '記事が更新されました。');
-            } else {
 
-                // 変更がない場合はback
+            // 変更がない場合はback
+            } else {
                 return back()->with('success', '記事の更新はありません。');
             }
         }
@@ -478,7 +478,7 @@ class ItemController extends Controller
                     'item_id' => $itemId,
                 ]);
 
-                return response()->json(['status' => 'ブックマーク処理が完了しました。', 'thumbnailPath' => $thumbnailPath]);
+                return response()->json(['status' => 'ブックマークしました。']);
             }
         }
 

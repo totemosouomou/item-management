@@ -41,7 +41,7 @@ class PostsTableSeeder extends Seeder
         ];
 
         // 各アイテムごとにループ
-        for ($i = 1; $i <= 50; $i++) {
+        for ($i = 1; $i <= 25; $i++) {
             // 各ユーザーごとにループ
             for ($j = 1; $j <= 32; $j++) {
                 // ランダムにコメントを選択
@@ -60,7 +60,7 @@ class PostsTableSeeder extends Seeder
         }
 
         // 生成したレコードをランダムに削除する
-        $deleteCount = 1250;
+        $deleteCount = 400;
         $posts = DB::table('posts')->inRandomOrder()->take($deleteCount)->pluck('id');
 
         DB::table('posts')->whereIn('id', $posts)->delete();

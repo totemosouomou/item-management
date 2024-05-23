@@ -127,18 +127,18 @@
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title text-dark font-weight-bold" id="urlModalLabel{{ $item->id }}">
+                                            <img class="star-btn mt-1 mr-1" src="{{ $item->bookmarks->isNotEmpty() ? asset('image/bookmark-icon-active.png') : asset('image/bookmark-icon-inactive.png') }}" alt="bookmark-icon" id="starBtn{{ $item->id }}" onclick="starItem({{ $item->id }}, '{{ $item->url }}')">
+                                            <h5 class="modal-title text-dark font-weight-bold" id="urlModalLabel{{ $item->id }}" onclick="starItem({{ $item->id }}, '{{ $item->url }}')">
                                                 {{ $item->title }}
                                             </h5>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
-                                        <p class="d-flex urls mx-3 my-0">
+                                        <p class="urls mx-3 my-0">
                                             <a href="{{ $item->url }}" style="text-decoration: none;" id="itemUrl_{{ $item->id }}">
                                                 {{ \Illuminate\Support\Str::limit($item->url, 80, $end='...') }}
                                             </a>
-                                            <span class="ml-2 star" onclick="starClick(this, {{ $item->id }}, '{{ $item->url }}')">☆</span>
                                         </p>
                                         <ul class="posts mx-3 mt-1 mb-0 list-unstyled list-inline" id="itemPost_{{ $item->id }}">
                                             @php
@@ -332,28 +332,52 @@
             }
         }
 
-function starClick(button, itemId, itemUrl) {
-    var formData = new FormData();
-    formData.append('url', itemUrl);
-    formData.append('itemId', itemId);
+// function starClick(button, itemId, itemUrl) {
+//     var formData = new FormData();
+//     formData.append('url', itemUrl);
+//     formData.append('itemId', itemId);
 
-    fetch('{{ url('items/bookmark') }}', {
-        method: 'post',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status) {
-            console.log(data.status);
+//     fetch('{{ url('items/bookmark') }}', {
+//         method: 'post',
+//         headers: {
+//             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+//         },
+//         body: formData
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.status) {
+//             console.log(data.status);
+//         }
+//     })
+//     .catch(error => {
+//         console.error('サムネイル画像の取得中にエラーが発生しました。', error);
+//     });
+// }
+
+        // ブックマークを処理するスクリプト
+        function starItem(itemId, itemUrl) {
+            $.ajax({
+                url: '{{ url('items/bookmark') }}',
+                type: 'post',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    itemId: itemId,
+                    url: itemUrl,
+                },
+                success: function(response) {
+                    if (response.status === 'ブックマークしました。') {
+                        document.getElementById('starBtn' + itemId).src = '{{ asset('image/bookmark-icon-active.png') }}';
+                    } else if (response.status === 'ブックマークを取り消しました。') {
+                        document.getElementById('starBtn' + itemId).src = '{{ asset('image/bookmark-icon-inactive.png') }}';
+                    }
+                },
+                error: function(xhr) {
+                    alert('エラーが発生し処理が完了しませんでした。');
+                }
+            });
         }
-    })
-    .catch(error => {
-        console.error('サムネイル画像の取得中にエラーが発生しました。', error);
-    });
-}
+
 
         // 記事詳細画面で、通報ボタンを処理するスクリプト
         function flagItem(button, itemId, itemStage) {

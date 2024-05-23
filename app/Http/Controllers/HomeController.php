@@ -68,7 +68,7 @@ class HomeController extends Controller
         // コメント一覧を取得
         $posts = Post::orderBy('created_at', 'desc')->take(30)->get();
 
-        // Trait内のメソッドを呼び出し、ユーザーのステージを取得
+        // Trait 内のメソッドを呼び出し、ユーザーのステージを取得
         $period = $this->getPeriodFromCreationDate();
         $randomItem = $this->getRandomItemByPeriod($period);
 

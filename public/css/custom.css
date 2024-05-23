@@ -67,6 +67,12 @@
   color: #fff;
 }
 
+.star-btn {
+  width: 20px;
+  height: 20px;
+  border: 0px;
+}
+
 .nav-link.active {
   background-color: #00ABAE !important;
 }

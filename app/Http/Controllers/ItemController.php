@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Process\Process;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\PeriodCalculator;
 use App\Http\Controllers\Traits\ArticleController;
@@ -128,33 +129,30 @@ class ItemController extends Controller
         // 検索機能
         if ($request->filled('search')) {
             $requestSearch = explode(' ', $request->input('search'));
-
-            // 空文字を含む場合は取り除く
             $requestSearch = array_filter($requestSearch, fn($value) => $value !== "");
-
-            // セッションに保存
             $request->session()->put('requestSearch', $requestSearch);
-
         } else {
             $requestSearch = $request->session()->get('requestSearch', []);
-
-            // 配列でない場合に配列へ変換
             if (!is_array($requestSearch)) {
                 $requestSearch = explode(' ', $requestSearch);
             }
-
-            // 空文字を含む場合は取り除く
             $requestSearch = array_filter($requestSearch, fn($value) => $value !== "");
-
-            // clear機能
             if ($request->filled('clear')) {
                 $clearValue = $request->input('clear');
                 $requestSearch = array_values(array_diff($requestSearch, [$clearValue]));
             }
-
-            // セッションに保存
             $request->session()->put('requestSearch', $requestSearch);
         }
+
+        // 記事のステージが指定されている場合
+        $stage = request()->route()->getName();
+        $titleNames = [
+            'week' => '1週間以内の記事',
+            'month' => '基礎課題の記事',
+            'quarter' => '応用課題の記事',
+            'term' => '開発課題の記事',
+        ];
+        $title_name = isset($titleNames[$stage]) ? $titleNames[$stage] : "全記事";
 
         // クエリビルダーの初期化
         $query = Item::with('posts')->with('bookmarks');
@@ -166,34 +164,37 @@ class ItemController extends Controller
             }
         }
 
-        // 記事のステージが指定されている場合の処理
-        $stage = request()->route()->getName();
-        $titleNames = [
-            'week' => '1週間以内の記事',
-            'month' => '基礎課題の記事',
-            'quarter' => '応用課題の記事',
-            'term' => '開発課題の記事',
-        ];
+        // ユーザーIDが自身に指定されている場合の処理
+        if ($user_id && $user == Auth::user()) {
 
-        $title_name = isset($titleNames[$stage]) ? $titleNames[$stage] : "全記事";
+            // ユーザーがブックマークしたアイテムIDを取得
+            $bookmarkedItemIds = Bookmark::where('user_id', Auth::id())->pluck('item_id')->toArray();
+            $query->where(function ($query) use ($user_id, $bookmarkedItemIds) {
+                $query->where('user_id', $user_id)
+                    ->orWhereIn('id', $bookmarkedItemIds); // ブックマークされたアイテムIDを含む
+            });
 
-        if ($user_id) {
-            $title_name = $user->name . "さんの記事";
+        // ユーザーIDが指定されている場合の処理
+        } elseif ($user_id) {
             $query->where('user_id', $user_id);
+
+        // 記事のステージが指定されている場合の処理
         } elseif ($title_name !== '全記事') {
             $query->where('stage', $stage);
         }
 
-        // ユーザーがフラグをつけたレコードを取得
+        // 表示させないアイテムを設定
         $flaggedItemIds = Flag::where('user_id', Auth::id())->pluck('item_id')->toArray();
+        $query->where('stage', '!=', 'inactive'); // ステージがinactiveでない場合の処理
+        $query->whereNotIn('id', $flaggedItemIds); // フラグがつけられたアイテムIDを除外する処理
 
-        // クエリの実行
-        $items = $query->where('stage', '!=', 'inactive')->whereNotIn('id', $flaggedItemIds)->orderBy('created_at', 'desc')->paginate($this->pagination($user_id));
+        // クエリの結果を取得
+        $items = $query->orderBy('created_at', 'desc')->paginate($this->pagination($user_id));
 
-        // Trait内のメソッドを呼び出し、ユーザーのステージを取得
+        // Trait 内のメソッドを呼び出し、ユーザーのステージを取得
         $period = $this->getPeriodFromCreationDate();
 
-        // Trait内のメソッドを呼び出し、指定された検索語に基づくQiitaの記事を取得
+        // Trait内のメソッドを呼び出し、指定された検索語に基づく Qiita の記事を取得
         $articles = $this->getQiitaArticles($requestSearch);
 
         // ユーザーIDが指定されている場合の処理
@@ -258,6 +259,9 @@ class ItemController extends Controller
                     'post' => $securePost . " by " . Auth::user()->name,
                 ]);
             }
+
+            // スクリーンショットを生成
+            $this->generateScreenshot($item->url, $item->id, 'bookmarks');
 
             return redirect("/items/{$period}")->with('success', '記事が登録されました。');
         }
@@ -373,6 +377,12 @@ class ItemController extends Controller
                 $item->posts()->delete();
                 $item->delete();
 
+                // スクリーンショットを削除
+                $thumbnailPath = storage_path('app/public/bookmarks/' . $item->id . '.png');
+                if (file_exists($thumbnailPath)) {
+                    unlink($thumbnailPath);
+                }
+
                 return back()->with('success', '記事を削除しました。');
             } else {
                 return back()->with('error', '指定された記事が見つかりませんでした。');
@@ -437,54 +447,64 @@ class ItemController extends Controller
     }
 
     /**
-     * 記事の bookmark（bookmarkを付けたり削除したりする）
+     * 記事のブックマーク
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function bookmarkItem(Request $request)
     {
-        $request->validate([
-            'image' => 'required|file|mimes:jpg,jpeg,png,webp,avif'
-        ]);
-
         // POSTリクエストのとき
         if ($request->isMethod('post')) {
 
             // アイテムIDを取得
-            $itemId = $request->input('item_id');
+            $itemId = $request->input('itemId');
 
-            // ユーザーが既にこのアイテムに bookmark を付けているか確認
+            // アイテムのURLを取得
+            $url = $request->input('url');
+
+            // ユーザーが既にこのアイテムにブックマークを付けているか確認
             $bookmark = Bookmark::where('user_id', Auth::id())->where('item_id', $itemId)->first();
 
-            // 既に bookmark が付いている場合、その bookmark を削除
+            // 既にブックマークが付いている場合は削除
             if ($bookmark) {
-                $bookmark->delete();  //　ファイルは削除しない
-                return response()->json(['status' => 'bookmark を取り消しました。']);
+                $bookmark->delete();  //  ファイルは削除しない
+                return response()->json(['status' => 'ブックマークを取り消しました。']);
 
-            // bookmark が付いていない場合、新しい bookmark を作成
+            // ブックマークが付いていない場合は作成
             } else {
-                $image = $request->file('image');
-                $extension = $image->extension();
-                $filename = $itemId . '.' . $extension;
-
-                // ファイルが存在しない場合のみ保存
-                if (!Storage::disk('public')->exists('bookmarks/' . $filename)) {
-                    $path = $image->storeAs('public/bookmarks', $filename);
-                } else {
-                    $path = 'bookmarks/' . $filename;
-                }
-
                 Bookmark::create([
                     'user_id' => Auth::id(),
                     'item_id' => $itemId,
-                    'thumbnail' => $path,
                 ]);
 
-                return response()->json(['status' => 'bookmark 処理が完了しました。']);
+                return response()->json(['status' => 'ブックマーク処理が完了しました。', 'thumbnailPath' => $thumbnailPath]);
             }
         }
 
         return abort(404)->with('error', 'エラーが発生し処理が完了しませんでした。');
+    }
+
+    /**
+     * スクリーンショットを生成
+     *
+     * @param string $url
+     * @param string $name
+     * @param string $dirname
+     * @return string
+     */
+    public function generateScreenshot($url, $name, $dirname)
+    {
+        $filename = $name . '.png';
+        $path = storage_path('app/public/' . $dirname. '/' . $filename);
+
+        $process = new Process(['node', base_path('screenshot.js'), $url, $path]);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new \RuntimeException('Failed to generate screenshot: ' . $process->getErrorOutput());
+        }
+
+        return $dirname. '/' . $filename;
     }
 }

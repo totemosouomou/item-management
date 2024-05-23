@@ -138,7 +138,7 @@
                                             <a href="{{ $item->url }}" style="text-decoration: none;" id="itemUrl_{{ $item->id }}">
                                                 {{ \Illuminate\Support\Str::limit($item->url, 80, $end='...') }}
                                             </a>
-                                            <span class="ml-2 star" onclick="starClick(this, {{ $item->id }})">☆</span>
+                                            <span class="ml-2 star" onclick="starClick(this, {{ $item->id }}, '{{ $item->url }}')">☆</span>
                                         </p>
                                         <ul class="posts mx-3 mt-1 mb-0 list-unstyled list-inline" id="itemPost_{{ $item->id }}">
                                             @php
@@ -332,44 +332,28 @@
             }
         }
 
-        // 記事詳細画面で、bookmarkボタンを処理するスクリプト
-        function starClick(button, itemId) {
-            var iframeSrc = $('#urlModal' + itemId).find('iframe').attr('src');
+function starClick(button, itemId, itemUrl) {
+    var formData = new FormData();
+    formData.append('url', itemUrl);
+    formData.append('itemId', itemId);
 
-            // サムネイルURLの生成
-            var thumbnailUrl = iframeSrc
-                .replace('/api/iframe?', '/api/thumbnail?')
-                .replace(/&v=1&app=1$/, '')
-                .replace(/&[^&]+$/, '&key={{ config('iframely.api.key') }}&maxwidth=320');
-            console.log(thumbnailUrl);
-
-            fetch(thumbnailUrl)
-                .then(response => response.blob())
-                .then(blob => {
-                    var formData = new FormData();
-                    formData.append('image', blob, 'thumbnail.jpg');
-                    formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
-                    formData.append('item_id', itemId);
-
-                    $.ajax({
-                        url: '{{ url('items/bookmark') }}',
-                        type: 'post',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.status === 'bookmark 処理が完了しました。') {
-                                button.textContent = '★';
-                            } else if (response.status === 'bookmark を取り消しました。') {
-                                button.textContent = '☆';
-                            }
-                        },
-                        error: function(xhr) {
-                            alert('エラーが発生し処理が完了しませんでした。');
-                        }
-                    });
-                });
+    fetch('{{ url('items/bookmark') }}', {
+        method: 'post',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status) {
+            console.log(data.status);
         }
+    })
+    .catch(error => {
+        console.error('サムネイル画像の取得中にエラーが発生しました。', error);
+    });
+}
 
         // 記事詳細画面で、通報ボタンを処理するスクリプト
         function flagItem(button, itemId, itemStage) {

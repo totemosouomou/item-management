@@ -3,7 +3,7 @@
 @section('title', '記事管理：Bookmark')
 
 @section('content_header')
-    <h1>bookmark</h1>
+    <h1>投稿＆ブックマーク</h1>
 @stop
 
 @section('content')
@@ -45,7 +45,7 @@
 
             @if (!$items->isEmpty())
                 @foreach ($items as $item)
-                    <a class="card bookmarks" href="#">
+                    <a class="card bookmarks" href="{{ $item->url }}">
                         <div class="card-body">
                             <div class="d-flex flex-wrap">
                                 <figure class="ml-3 mb-0 figure-area d-flex justify-content-between">
@@ -65,9 +65,7 @@
                                                 <p class="mb-0">{{ \Illuminate\Support\Str::limit($item->url, 45, $end='...') }}</p>
                                             @endif
                                     </div>
-                                    @if($item->bookmarks->isNotEmpty())
-                                        <img src="{{ asset('storage/' . $item->bookmarks->first()->thumbnail) }}" alt="Bookmark Thumbnail" class="img-fluid">
-                                    @endif
+                                    <img src="{{ asset('storage/bookmarks/' . $item->id . '.png') }}" alt="Thumbnail" class="img-fluid" onmouseover="openImageInNewTab('{{ asset('storage/bookmarks/' . $item->id . '.png') }}')">
                                 </figure>
                             </div>
                         </div>
@@ -98,168 +96,8 @@
 
 @section('js')
     <script>
-        // 画像が拡大する post-image クラスの設定
-        $('.post-image').click(function() {
-            // altText の値を取得
-            var altText = $(this).attr('alt');
-
-            // src の値を取得
-            var src = $(this).attr('src');
-
-            // showModalWithAlt 関数を呼び出す
-            showModalWithAlt(altText, src, 60000);
-        });
-
-        // img 要素の alt の内容と src をモーダルへ渡す
-        function showModalWithAlt(altText, src, duration) {
-            // モーダルの存在をチェック
-            if ($('#modalWrap').length > 0) {
-                // モーダルが存在する場合は処理を実行
-                showModal(altText, src, duration);
-            }
-        }
-
-        // モーダルを表示するためのコード
-        function showModal(altText, src, duration) {
-
-            // bodyの最下にwrapを作る
-            if ($('#modalWrap').length < 1) {
-                $('body').append('<div id="modalWrap" />');
-            }
-            var wrap = $('#modalWrap');
-
-            // モーダルの表示を切り替える
-            wrap.fadeIn('200');
-
-            // モーダルの中に content を挿入する
-            var modalContent = '<div class="modalInner"><p>' + altText + '</p><img src="' + src + '" class="modalImage"></div>';
-            $('.modalBox').html(modalContent);
-
-            // 画像の読み込みが完了した後に画像のサイズを調整する
-            $('.modalImage').on('load', function() {
-                adjustImageSize();
-            });
-
-            // ウィンドウのリサイズ時に画像のサイズを再調整する
-            $(window).on('resize', function () {
-                adjustImageSize();
-            });
-
-            // モーダルをクリックしたら消える
-            $('.modalBox').on('click', function () {
-                clearTimeout(modalTimeout);
-                clickAction();
-                return false;
-            });
-
-            // 一定時間後に消える
-            var modalTimeout = setTimeout(clickAction, duration);
-
-            // モーダルをフェードイン
-            $('.modalBox').fadeIn('200');
-        }
-
-        // キーボードの矢印キーでモーダル内の画像を切り替える
-        $(document).keydown(function(e) {
-
-            // モーダルが表示されている場合に動作
-            if ($('#modalWrap').is(':visible')) {
-
-                // 右矢印キーまたは下矢印キーが押された場合の処理
-                if (e.keyCode == 39 || e.keyCode == 40) {
-
-                    // すべての.tweet 要素をループ処理
-                    $('.tweet').each(function() {
-                        var currentSrc = $('.modalBox .modalInner img').attr('src');
-                        var targetSrc = $(this).find('.post-image').attr('src');
-                        var nextTweet = $(this).next('.tweet');
-
-                        // 次の.tweet 要素が存在しないか、.post-image 要素が存在しない場合
-                        while (nextTweet.length !== 0 && !nextTweet.find('.post-image').length) {
-                            nextTweet = nextTweet.next('.tweet'); // 次の .tweet 要素を探す
-                        }
-
-                        // 次の要素の高さを取得し、その高さだけスクロールする
-                        if (nextTweet.length !== 0 && currentSrc === targetSrc) {
-                            var nextTweetHeight = nextTweet.offset().top;
-                            if (e.keyCode == 40) {
-                                $('html, body').animate({ scrollTop: nextTweetHeight }, 'fast');
-                            } else {
-                                $('html, body').scrollTop(nextTweetHeight);
-                            }
-                            nextTweet.find('.post-image').click();
-                            console.log('Left arrow key pressed');
-                            return false;
-                        }
-                    });
-                }
-
-                // 左矢印キーまたは上矢印キーが押された場合の処理
-                else if (e.keyCode == 37 || e.keyCode == 38) {
-
-                    // すべての.tweet 要素をループ処理
-                    $('.tweet').each(function() {
-                        var currentSrc = $('.modalBox .modalInner img').attr('src');
-                        var targetSrc = $(this).find('.post-image').attr('src');
-                        var prevTweet = $(this).prev('.tweet');
-
-                        // 次の.tweet 要素が存在しないか、.post-image 要素が存在しない場合
-                        while (prevTweet.length !== 0 && !prevTweet.find('.post-image').length) {
-                            prevTweet = prevTweet.prev('.tweet'); // 次の .tweet 要素を探す
-                        }
-
-                        // 次の要素の高さを取得し、その高さだけスクロールする
-                        if (prevTweet.length !== 0 && currentSrc === targetSrc) {
-                            var prevTweetHeight = prevTweet.offset().top;
-                            if (e.keyCode == 38) {
-                                $('html, body').animate({ scrollTop: prevTweetHeight }, 'fast');
-                            } else {
-                                $('html, body').scrollTop(prevTweetHeight);
-                            }
-                            prevTweet.find('.post-image').click();
-                            console.log('Left arrow key pressed');
-                            return false;
-                        }
-                    });
-                }
-            }
-        });
-
-        // 画像のサイズを調整する関数
-        function adjustImageSize() {
-
-            var windowHeight = $(window).innerHeight();
-            var windowWidth = $(window).innerWidth();
-            var modalImage = $('.modalImage');
-            var imageHeight = modalImage.height();
-            var imageWidth = modalImage.width();
-
-            // 画像の縦横比を維持しながら、表示画面の幅または高さに収まるように調整する
-            if ((imageHeight / imageWidth) > (windowHeight / windowWidth)) {
-                modalImage.css({ width: 'auto', height: windowHeight * 0.85 });
-            } else {
-                modalImage.css({ width: windowWidth * 0.95, height: 'auto' });
-            }
-        }
-
-        // モーダルが非表示になったら要素の内容をクリアにする
-        function clickAction() {
-            $('.modalBox').fadeOut('200');
-            $('#modalWrap').fadeOut('200', function () {
-                $('.modalBox').empty();
-            });
-        }
-
-        // 祖父要素の中で、親要素の指定の属性値が一致する要素を検索する関数
-        function findDraggableInGrandparent(grandparentSelector, tagName, attributeName, attributeValue) {
-            var grandparentDiv = document.querySelector(grandparentSelector);
-            if (!grandparentDiv) {
-                return [];
-            }
-
-            // 祖父要素の中で、親要素の指定の属性値が一致する要素を検索
-            var parentElements = grandparentDiv.querySelectorAll(`${tagName}[${attributeName}="${attributeValue}"]`);
-            return Array.from(parentElements);
+        function openImageInNewTab(url) {
+            window.open(url, '_blank');
         }
     </script>
 @stop

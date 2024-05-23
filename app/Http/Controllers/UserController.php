@@ -47,8 +47,7 @@ class UserController extends Controller
             }
 
             // トークンを生成
-            $token = Hash::make($request['name'] . $request['email']);
-            $token = substr($token, 40, 60);
+            $token = md5($request['name'] . $request['email']);
 
             // 新しいユーザーを作成
             User::create([

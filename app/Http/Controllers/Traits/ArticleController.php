@@ -31,9 +31,9 @@ trait ArticleController
         // オプションを設定
         curl_setopt($ch, CURLOPT_URL, 'https://qiita.com/api/v2/items?page=1&per_page=10&query=' . $query);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Authorization: Bearer ' . $accessToken,
-        ]);
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        //     'Authorization: Bearer ' . $accessToken,
+        // ]);
 
         // リクエストを実行してレスポンスを取得
         $response = curl_exec($ch);

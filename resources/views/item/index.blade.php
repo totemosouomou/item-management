@@ -127,7 +127,7 @@
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <img class="star-btn mt-1 mr-1" src="{{ $item->bookmarks->isNotEmpty() ? asset('image/bookmark-icon-active.png') : asset('image/bookmark-icon-inactive.png') }}" alt="bookmark-icon" id="starBtn{{ $item->id }}" onclick="starItem({{ $item->id }}, '{{ $item->url }}')">
+                                            <img class="star-btn mt-1 mr-1" src="{{ $item->bookmarks->isNotEmpty() ? asset('image/bookmark-icon-active.png') : asset('image/bookmark-icon-inactive.png') }}" alt="bookmark-icon" id="starBtn{{ $item->id }}" onclick="starItem({{ $item->id }}, '{{ $item->url }}')" style="width: 20px; height: 20px; border: 0px;">
                                             <h5 class="modal-title text-dark font-weight-bold" id="urlModalLabel{{ $item->id }}" onclick="starItem({{ $item->id }}, '{{ $item->url }}')">
                                                 {{ $item->title }}
                                             </h5>

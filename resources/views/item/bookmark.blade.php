@@ -65,7 +65,7 @@
                                                 <p class="mb-0">{{ \Illuminate\Support\Str::limit($item->url, 45, $end='...') }}</p>
                                             @endif
                                     </div>
-                                    @if (!$item->bookmarks->isEmpty())
+                                    @if (!$item->bookmarks->isEmpty() && $item->bookmarks->first() && $item->bookmarks->first()->thumbnail !== null)
                                         <img src="{{ asset('storage/bookmarks/' . $item->id . '.png') }}" alt="Thumbnail" class="img-fluid" onmouseover="openImageInNewTab('{{ asset('storage/bookmarks/' . $item->id . '.png') }}')">
                                     @endif
                                 </figure>

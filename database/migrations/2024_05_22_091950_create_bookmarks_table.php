@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade')->name('bookmarks_user_id_foreign');
             $table->foreignId('item_id')->constrained()->onDelete('cascade')->name('bookmarks_item_id_foreign');
-            $table->string('thumbnail');
+            $table->string('thumbnail')->nullable();
             $table->text('detail')->nullable();
             $table->timestamps();
         });

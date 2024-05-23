@@ -261,7 +261,7 @@ class ItemController extends Controller
             }
 
             // スクリーンショットを生成
-            $this->generateScreenshot($item->url, $item->id, 'bookmarks');
+            // $this->generateScreenshot($item->url, $item->id, 'bookmarks');
 
             return redirect("/items/{$period}")->with('success', '記事が登録されました。');
         }

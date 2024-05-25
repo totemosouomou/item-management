@@ -165,12 +165,12 @@
   margin-left: 16px;
 }
 
-.contents {
+.figcaption-contents {
   position: relative;
   padding-left: 10px;
 }
 
-.contents::before {
+.figcaption-contents::before {
   content: '';
   position: absolute;
   top: -5px;
@@ -180,7 +180,7 @@
   background-color: rgba(0, 171, 174, 0.8);
 }
 
-.contents::after {
+.figcaption-contents::after {
   content: '';
   position: absolute;
   top: -5px;
@@ -247,7 +247,7 @@
 .img-container:hover {
   transform: scale(8);
   right: 322px;
-  bottom: 112px;
+  bottom: 50%;
 }
 
 .img-container:hover img {

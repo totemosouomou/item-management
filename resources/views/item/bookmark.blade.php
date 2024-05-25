@@ -58,7 +58,7 @@
                     <a class="card card-body bookmarks bookmark-block" href="{{ $item->url }}">
                         <div class="d-flex flex-wrap">
                             <figure class="ml-2 mb-0 figure-area d-flex justify-content-between">
-                                <div class="{{ Storage::exists($imagePath) ? 'text-content' : '' }} contents mt-1">
+                                <div class="{{ Storage::exists($imagePath) ? 'text-content' : '' }} figcaption-contents mt-1">
                                     <figcaption class="text-dark font-weight-bold">{{ $item->title }}</figcaption>
                                         @if ($userPost)
                                             <p class="list-inline-item mb-0" style="border-radius: 10px; padding: 1px 20px; font-size: 0.8em; background-color: rgba(250, 250, 250, 0.5); color: rgba(33, 37, 41, 0.8); text-decoration: none;">{{ $userPost }}</p>
@@ -105,32 +105,42 @@
     <script>
         // リンク先の画像の長さによらずスクロール速度を固定にする
         document.addEventListener('DOMContentLoaded', function() {
-        const imgContainers = document.querySelectorAll('.img-container');
+            const imgContainers = document.querySelectorAll('.img-container');
 
-        imgContainers.forEach(container => {
-            const img = container.querySelector('img');
+            imgContainers.forEach((container) => {
+                const img = container.querySelector('img');
+                let bottomValue;
 
-            img.addEventListener('load', function() {
-                const height = img.naturalHeight;
-                const duration = height / 750;
-                img.style.objectPosition = '0 0';
-
-                container.addEventListener('mouseover', function() {
-                    img.style.transitionDuration = `${duration}s`;
-                    console.log(`Image ${img.id} duration set to: ${duration}s`);
-                    img.style.objectPosition = '0 100%';
-                });
-
-                container.addEventListener('mouseout', function() {
-                    img.style.transitionDuration = `${duration*0.5}s`;
+                img.addEventListener('load', function() {
+                    const containerRect = container.getBoundingClientRect();
+                    const windowCenter = window.innerHeight / 2;
+                    const distanceFromCenter = containerRect.bottom - windowCenter;
+                    const dampingFactor = 0.66;
+                    let bottomValue = distanceFromCenter * dampingFactor;
+                    const imgHeight = img.naturalHeight;
+                    const duration = imgHeight / 750;
                     img.style.objectPosition = '0 0';
-                });
-            });
 
-            if (img.complete) {
-                img.dispatchEvent(new Event('load'));
-            }
+                    container.addEventListener('mouseover', function() {
+                        img.style.transitionDuration = `${duration}s`;
+                        console.log(`Image ${img.id} duration set to: ${duration}s`);
+                        img.style.objectPosition = '0 100%';
+                        container.closest('.card').style.zIndex = '10000';
+                        container.style.setProperty('bottom', `${bottomValue}px`);
+                    });
+
+                    container.addEventListener('mouseout', function() {
+                        img.style.transitionDuration = `${duration*0.25}s`;
+                        img.style.objectPosition = '0 0';
+                        container.closest('.card').style.zIndex = '1';
+                        container.style.setProperty('bottom', `11px`);
+                    });
+                });
+
+                if (img.complete) {
+                    img.dispatchEvent(new Event('load'));
+                }
+            });
         });
-    });
     </script>
 @stop

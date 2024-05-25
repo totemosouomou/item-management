@@ -117,7 +117,7 @@
 
                         @if (!$items->isEmpty())
                         @foreach ($items as $item)
-                            <figure class="m-3 contents" data-toggle="modal" data-target="#urlModal{{ $item->id }}" onClick="openModal(this, '{{ $item->url }}')">
+                            <figure class="m-3 figcaption-contents" data-toggle="modal" data-target="#urlModal{{ $item->id }}" onClick="openModal(this, '{{ $item->url }}')">
                                 <figcaption class="text-dark font-weight-bold">{{ $item->title }}</figcaption>
                                     @if ($item->posts->where('user_id', Auth::user()->id)->first())
                                         <p class="list-inline-item mb-0" style="border-radius: 10px; padding: 1px 20px; font-size: 0.8em; background-color: rgba(250, 250, 250, 0.5); color: rgba(33, 37, 41, 0.8); text-decoration: none;">{{ str_replace(" by " . Auth::user()->name, "", $item->posts->where('user_id', Auth::user()->id)->first()->post) }}</p>

@@ -119,7 +119,11 @@
                         @foreach ($items as $item)
                             <figure class="m-3 contents" data-toggle="modal" data-target="#urlModal{{ $item->id }}" onClick="openModal(this, '{{ $item->url }}')">
                                 <figcaption class="text-dark font-weight-bold">{{ $item->title }}</figcaption>
-                                    <p>{{ \Illuminate\Support\Str::limit($item->url, 45, $end='...') }}</p>
+                                    @if ($item->posts->where('user_id', Auth::user()->id)->first())
+                                        <p class="list-inline-item mb-0" style="border-radius: 10px; padding: 1px 20px; font-size: 0.8em; background-color: rgba(250, 250, 250, 0.5); color: rgba(33, 37, 41, 0.8); text-decoration: none;">{{ str_replace(" by " . Auth::user()->name, "", $item->posts->where('user_id', Auth::user()->id)->first()->post) }}</p>
+                                    @else
+                                        <p class="mb-0">{{ \Illuminate\Support\Str::limit($item->url, 45, $end='...') }}</p>
+                                    @endif
                             </figure>
 
                             <!-- URL表示用のモーダル -->
@@ -128,7 +132,7 @@
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <img class="star-btn mt-1 mr-1" src="{{ $item->bookmarks->isNotEmpty() ? asset('image/bookmark-icon-active.png') : asset('image/bookmark-icon-inactive.png') }}" alt="bookmark-icon" id="starBtn{{ $item->id }}" onclick="starItem({{ $item->id }}, '{{ $item->url }}')" style="width: 20px; height: 20px; border: 0px;">
-                                            <h5 class="modal-title text-dark font-weight-bold" id="urlModalLabel{{ $item->id }}" onclick="starItem({{ $item->id }}, '{{ $item->url }}')">
+                                            <h5 class="modal-title text-dark font-weight-bold pointer" id="urlModalLabel{{ $item->id }}" onclick="starItem({{ $item->id }}, '{{ $item->url }}')">
                                                 {{ $item->title }}
                                             </h5>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">

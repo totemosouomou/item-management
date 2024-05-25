@@ -45,28 +45,31 @@
 
             @if (!$items->isEmpty())
                 @foreach ($items as $item)
+                    @php
+                        $imagePath = 'public/bookmarks/' . $item->id . '.png';
+                        $userPost = null;
+                        $userPostGet = $item->posts->where('user_id', Auth::user()->id)
+                            ->first();
+                        if ($userPostGet) {
+                            $userPost = str_replace(" by " . Auth::user()->name, "", $userPostGet->post);
+                        }
+                    @endphp
                     <a class="card bookmarks" href="{{ $item->url }}">
                         <div class="card-body">
                             <div class="d-flex flex-wrap">
                                 <figure class="ml-3 mb-0 figure-area d-flex justify-content-between">
-                                    <div class="text-content contents mt-1">
+                                    <div class="{{ Storage::exists($imagePath) ? 'text-content' : '' }} contents mt-1">
                                         <figcaption class="text-dark font-weight-bold">{{ $item->title }}</figcaption>
-                                            @php
-                                                $userPost = null;
-                                                $userPostGet = $item->posts->where('user_id', Auth::user()->id)
-                                                    ->first();
-                                                if ($userPostGet) {
-                                                    $userPost = str_replace(" by " . Auth::user()->name, "", $userPostGet->post);
-                                                }
-                                            @endphp
                                             @if ($userPost)
                                                 <p class="list-inline-item mb-0" style="border-radius: 10px; padding: 1px 20px; font-size: 0.8em; background-color: rgba(250, 250, 250, 0.5); color: rgba(33, 37, 41, 0.8); text-decoration: none;">{{ $userPost }}</p>
                                             @else
                                                 <p class="mb-0">{{ \Illuminate\Support\Str::limit($item->url, 45, $end='...') }}</p>
                                             @endif
                                     </div>
-                                    @if (!$item->bookmarks->isEmpty() && $item->bookmarks->first() && $item->bookmarks->first()->thumbnail !== null)
-                                        <img src="{{ asset('storage/bookmarks/' . $item->id . '.png') }}" alt="Thumbnail" class="img-fluid" onmouseover="openImageInNewTab('{{ asset('storage/bookmarks/' . $item->id . '.png') }}')">
+                                    @if (Storage::exists($imagePath))
+                                        <div class="img-container">
+                                            <img src="{{ asset('storage/bookmarks/' . $item->id . '.png') }}" alt="Thumbnail">
+                                        </div>
                                     @endif
                                 </figure>
                             </div>
@@ -97,9 +100,4 @@
 @stop
 
 @section('js')
-    <script>
-        function openImageInNewTab(url) {
-            window.open(url, '_blank');
-        }
-    </script>
 @stop

@@ -66,9 +66,9 @@
                                             <p class="mb-0">{{ \Illuminate\Support\Str::limit($item->url, 45, $end='...') }}</p>
                                         @endif
                                 </div>
-                                @if (Storage::exists($imagePath))
+                                @if ($item->bookmarks->isNotEmpty() && $item->bookmarks->first()->thumbnail)
                                     <div class="img-container" id="{{ $item->id }}">
-                                        <img src="{{ asset('storage/bookmarks/' . $item->id . '.png') }}" alt="Thumbnail">
+                                        <img src="{{ $item->bookmarks->first()->thumbnail }}" alt="Thumbnail">
                                     </div>
                                 @endif
                             </figure>

@@ -261,7 +261,19 @@ class ItemController extends Controller
             }
 
             // スクリーンショットを生成
-            // $this->generateScreenshot($item->url, $item->id, 'bookmarks');
+            $screenshotPath = $this->generateScreenshot($item->url, $item->id, 'bookmarks');
+
+            // Base64 エンコード
+            $imageData = file_get_contents($screenshotPath);
+            $base64Image = base64_encode($imageData);
+            $mimeType = 'image/png';
+
+            // ブックマーク登録
+            Bookmark::create([
+                'user_id' => Auth::id(),
+                'item_id' => $item->id,
+                'thumbnail' => 'data:' . $mimeType . ';base64,' . $base64Image,
+            ]);
 
             return redirect("/items/{$period}")->with('success', '記事が登録されました。');
         }
@@ -495,8 +507,14 @@ class ItemController extends Controller
      */
     public function generateScreenshot($url, $name, $dirname)
     {
+        // フォルダが存在しない場合は作成
+        $storagePath = storage_path('app/public/' . $dirname);
+        if (!file_exists($storagePath)) {
+            mkdir($storagePath, 0755, true);
+        }
+
         $filename = $name . '.png';
-        $path = storage_path('app/public/' . $dirname. '/' . $filename);
+        $path = $storagePath . '/' . $filename;
 
         $process = new Process(['node', base_path('screenshot.js'), $url, $path]);
         $process->run();
@@ -505,6 +523,6 @@ class ItemController extends Controller
             throw new \RuntimeException('Failed to generate screenshot: ' . $process->getErrorOutput());
         }
 
-        return $dirname. '/' . $filename;
+        return $path;
     }
 }

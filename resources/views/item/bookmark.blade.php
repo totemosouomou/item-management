@@ -44,6 +44,7 @@
             @endif
 
             @if (!$items->isEmpty())
+                <div class="d-flex flex-wrap bookmark-items">
                 @foreach ($items as $item)
                     @php
                         $imagePath = 'public/bookmarks/' . $item->id . '.png';
@@ -54,40 +55,41 @@
                             $userPost = str_replace(" by " . Auth::user()->name, "", $userPostGet->post);
                         }
                     @endphp
-                    <a class="card bookmarks" href="{{ $item->url }}">
-                        <div class="card-body">
-                            <div class="d-flex flex-wrap">
-                                <figure class="ml-3 mb-0 figure-area d-flex justify-content-between">
-                                    <div class="{{ Storage::exists($imagePath) ? 'text-content' : '' }} contents mt-1">
-                                        <figcaption class="text-dark font-weight-bold">{{ $item->title }}</figcaption>
-                                            @if ($userPost)
-                                                <p class="list-inline-item mb-0" style="border-radius: 10px; padding: 1px 20px; font-size: 0.8em; background-color: rgba(250, 250, 250, 0.5); color: rgba(33, 37, 41, 0.8); text-decoration: none;">{{ $userPost }}</p>
-                                            @else
-                                                <p class="mb-0">{{ \Illuminate\Support\Str::limit($item->url, 45, $end='...') }}</p>
-                                            @endif
+                    <a class="card card-body bookmarks bookmark-block" href="{{ $item->url }}">
+                        <div class="d-flex flex-wrap">
+                            <figure class="ml-2 mb-0 figure-area d-flex justify-content-between">
+                                <div class="{{ Storage::exists($imagePath) ? 'text-content' : '' }} contents mt-1">
+                                    <figcaption class="text-dark font-weight-bold">{{ $item->title }}</figcaption>
+                                        @if ($userPost)
+                                            <p class="list-inline-item mb-0" style="border-radius: 10px; padding: 1px 20px; font-size: 0.8em; background-color: rgba(250, 250, 250, 0.5); color: rgba(33, 37, 41, 0.8); text-decoration: none;">{{ $userPost }}</p>
+                                        @else
+                                            <p class="mb-0">{{ \Illuminate\Support\Str::limit($item->url, 45, $end='...') }}</p>
+                                        @endif
+                                </div>
+                                @if (Storage::exists($imagePath))
+                                    <div class="img-container" id="{{ $item->id }}">
+                                        <img src="{{ asset('storage/bookmarks/' . $item->id . '.png') }}" alt="Thumbnail">
                                     </div>
-                                    @if (Storage::exists($imagePath))
-                                        <div class="img-container">
-                                            <img src="{{ asset('storage/bookmarks/' . $item->id . '.png') }}" alt="Thumbnail">
-                                        </div>
-                                    @endif
-                                </figure>
-                            </div>
+                                @endif
+                            </figure>
                         </div>
                     </a>
                 @endforeach
+                </div>
             @else
                 <p>No articles found.</p>
             @endif
-                <!-- ページネーション -->
-                @if ($items->hasPages())
-                    <div class="card-footer clearfix pb-0">
-                        {{ $items->appends(['search' => implode(' ', (array)session('requestSearch', []))])->links() }}
-                    </div>
-                @endif
+
+            <!-- ページネーション -->
+            @if ($items->hasPages())
+                <div class="card-footer clearfix pb-0">
+                    {{ $items->appends(['search' => implode(' ', (array)session('requestSearch', []))])->links() }}
+                </div>
+            @endif
 
             <!-- Qitta記事をapiで取得 -->
             @include('item.articles')
+
         </div>
     </div>
 @stop
@@ -100,4 +102,35 @@
 @stop
 
 @section('js')
+    <script>
+        // リンク先の画像の長さによらずスクロール速度を固定にする
+        document.addEventListener('DOMContentLoaded', function() {
+        const imgContainers = document.querySelectorAll('.img-container');
+
+        imgContainers.forEach(container => {
+            const img = container.querySelector('img');
+
+            img.addEventListener('load', function() {
+                const height = img.naturalHeight;
+                const duration = height / 750;
+                img.style.objectPosition = '0 0';
+
+                container.addEventListener('mouseover', function() {
+                    img.style.transitionDuration = `${duration}s`;
+                    console.log(`Image ${img.id} duration set to: ${duration}s`);
+                    img.style.objectPosition = '0 100%';
+                });
+
+                container.addEventListener('mouseout', function() {
+                    img.style.transitionDuration = `${duration*0.5}s`;
+                    img.style.objectPosition = '0 0';
+                });
+            });
+
+            if (img.complete) {
+                img.dispatchEvent(new Event('load'));
+            }
+        });
+    });
+    </script>
 @stop

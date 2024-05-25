@@ -190,16 +190,28 @@
   background-color: rgba(0, 171, 174, 0.8);
 }
 
+.bookmark-items {
+  width: 100%;
+}
+
 .bookmarks {
   transition: transform 0.3s, box-shadow 0.3s;
   color: rgba(33, 37, 41, 0.8);
   text-decoration: none;
+  min-width: 100%;
 }
 
 .bookmarks:hover {
   transform: translateY(-1px);
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   color: rgba(33, 37, 41, 0.8);
+}
+
+@media (min-width: 1600px) {
+  .bookmark-block {
+    min-width: calc(50% - 5px) !important;
+    margin-right: 5px;
+  }
 }
 
 .figure-area {
@@ -214,13 +226,12 @@
 }
 
 .img-container {
-  position: relative;
+  position: absolute;
   width: 92px;
   height: 69px;
   overflow: hidden;
   border-radius: 10%;
   margin-left: auto;
-  position: absolute;
   right: 12px;
   bottom: 11px;
   transition: transform 0.3s ease-in-out, right 0.3s ease-in-out, bottom 0.3s ease-in-out;
@@ -231,13 +242,12 @@
   height: 100%;
   object-fit: cover;
   object-position: 0 0;
-  transition: object-position 6.5s ease-in-out;
 }
 
 .img-container:hover {
-  transform: scale(6.5);
-  right: 253px;
-  bottom: 66px;
+  transform: scale(8);
+  right: 322px;
+  bottom: 112px;
 }
 
 .img-container:hover img {

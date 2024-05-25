@@ -336,28 +336,28 @@
             }
         }
 
-// function starClick(button, itemId, itemUrl) {
-//     var formData = new FormData();
-//     formData.append('url', itemUrl);
-//     formData.append('itemId', itemId);
-
-//     fetch('{{ url('items/bookmark') }}', {
-//         method: 'post',
-//         headers: {
-//             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-//         },
-//         body: formData
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         if (data.status) {
-//             console.log(data.status);
-//         }
-//     })
-//     .catch(error => {
-//         console.error('サムネイル画像の取得中にエラーが発生しました。', error);
-//     });
-// }
+        // 記事詳細画面で、通報ボタンを処理するスクリプト
+        function flagItem(button, itemId, itemStage) {
+            $.ajax({
+                url: '{{ url('items/flag') }}',
+                type: 'post',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    item_id: itemId,
+                    stage: itemStage,
+                },
+                success: function(response) {
+                    if (response.status === '通報処理が完了しました。') {
+                        button.classList.add('active');
+                    } else if (response.status === '通報を取り消しました。') {
+                        button.classList.remove('active');
+                    }
+                },
+                error: function(xhr) {
+                    alert('エラーが発生し処理が完了しませんでした。');
+                }
+            });
+        }
 
         // ブックマークを処理するスクリプト
         function starItem(itemId, itemUrl) {
@@ -374,30 +374,6 @@
                         document.getElementById('starBtn' + itemId).src = '{{ asset('image/bookmark-icon-active.png') }}';
                     } else if (response.status === 'ブックマークを取り消しました。') {
                         document.getElementById('starBtn' + itemId).src = '{{ asset('image/bookmark-icon-inactive.png') }}';
-                    }
-                },
-                error: function(xhr) {
-                    alert('エラーが発生し処理が完了しませんでした。');
-                }
-            });
-        }
-
-
-        // 記事詳細画面で、通報ボタンを処理するスクリプト
-        function flagItem(button, itemId, itemStage) {
-            $.ajax({
-                url: '{{ url('items/flag') }}',
-                type: 'post',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    item_id: itemId,
-                    stage: itemStage,
-                },
-                success: function(response) {
-                    if (response.status === '通報処理が完了しました。') {
-                        button.classList.add('active');
-                    } else if (response.status === '通報を取り消しました。') {
-                        button.classList.remove('active');
                     }
                 },
                 error: function(xhr) {

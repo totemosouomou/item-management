@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Process;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\PeriodCalculator;
@@ -251,6 +252,7 @@ class ItemController extends Controller
                 'url' => $secureUrl,
                 'stage' => $period,
             ]);
+            Log::info('item: ' . $item);
 
             // コメント登録
             if ($securePost) {
@@ -260,7 +262,6 @@ class ItemController extends Controller
                     'post' => $securePost . " by " . Auth::user()->name,
                 ]);
             }
-            Log::info('item: ' . $item);
             Log::info('securePost: ' . $securePost);
 
             // スクリーンショットを生成

@@ -213,6 +213,7 @@ class ItemController extends Controller
      */
     public function add(Request $request, $urlInput = null)
     {
+        try {
         // Trait 内のメソッドを呼び出し、ユーザーのステージを取得
         $period = $this->getPeriodFromCreationDate();
 
@@ -279,6 +280,10 @@ class ItemController extends Controller
         }
 
         return redirect("/items/{$period}")->with('add', "記事登録")->with('urlInput', $this->secure($urlInput));
+    } catch (\Exception $e) {
+        Log::error('Error adding item: ' . $e->getMessage());
+        return response()->json(['error' => 'Failed to add item'], 500);
+    }
     }
 
     /**

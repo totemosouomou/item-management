@@ -3,7 +3,8 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "test-puppeteer": "node -e \"const puppeteer = require('puppeteer'); console.log('Puppeteer is installed');\""
     },
     "devDependencies": {
         "@popperjs/core": "^2.11.6",
@@ -16,6 +17,6 @@
     },
     "dependencies": {
         "md5": "^2.3.0",
-        "puppeteer": "^22.9.0"
+        "puppeteer": "^22.10.0"
     }
 }

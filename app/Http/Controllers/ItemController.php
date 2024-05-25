@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Process;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\PeriodCalculator;
@@ -214,7 +213,6 @@ class ItemController extends Controller
      */
     public function add(Request $request, $urlInput = null)
     {
-        try {
         // Trait 内のメソッドを呼び出し、ユーザーのステージを取得
         $period = $this->getPeriodFromCreationDate();
 
@@ -252,7 +250,6 @@ class ItemController extends Controller
                 'url' => $secureUrl,
                 'stage' => $period,
             ]);
-            Log::info('item: ' . $item);
 
             // コメント登録
             if ($securePost) {
@@ -262,11 +259,9 @@ class ItemController extends Controller
                     'post' => $securePost . " by " . Auth::user()->name,
                 ]);
             }
-            Log::info('securePost: ' . $securePost);
 
             // スクリーンショットを生成
             $screenshotPath = $this->generateScreenshot($item->url, $item->id, 'bookmarks');
-            Log::info('screenshotPath: ' . $screenshotPath);
 
             // Base64 エンコード
             $imageData = file_get_contents($screenshotPath);
@@ -284,10 +279,6 @@ class ItemController extends Controller
         }
 
         return redirect("/items/{$period}")->with('add', "記事登録")->with('urlInput', $this->secure($urlInput));
-    } catch (\Exception $e) {
-        Log::error('Error adding item: ' . $e->getMessage());
-        return response()->json(['error' => 'Failed to add item'], 500);
-    }
     }
 
     /**
@@ -514,29 +505,30 @@ class ItemController extends Controller
      * @param string $dirname
      * @return string
      */
-    public function generateScreenshot($url, $name, $dirname)
-    {
-        // フォルダが存在しない場合は作成
-        $storagePath = storage_path('app/public/' . $dirname);
-        if (!file_exists($storagePath)) {
-            mkdir($storagePath, 0755, true);
-        }
-        Log::info('storagePath: ' . $storagePath);
-    
-        $filename = $name . '.png';
-        $path = $storagePath . '/' . $filename;
-        Log::info('path: ' . $path);
-    
-        $process = new Process(['node', base_path('screenshot.js'), $url, $path]);
-        $process->run();
-        Log::info('process: clear');
-
-        if (!$process->isSuccessful()) {
-            Log::error('Failed to generate screenshot: ' . $process->getErrorOutput());
-            throw new \RuntimeException('Failed to generate screenshot: ' . $process->getErrorOutput());
-        }
-    
-        return $path;
+public function generateScreenshot($url, $name, $dirname)
+{
+    // フォルダが存在しない場合は作成
+    $storagePath = storage_path('app/public/' . $dirname);
+    if (!file_exists($storagePath)) {
+        mkdir($storagePath, 0755, true);
     }
-    
+    Log::info('storagePath: ' . $storagePath);
+
+    $filename = $name . '.png';
+    $path = $storagePath . '/' . $filename;
+    Log::info('path: ' . $path);
+
+    $process = new Process(['node', base_path('screenshot.js'), $url, $path]);
+    $process->run(function ($type, $buffer) {
+        Log::info('Process output: ' . $buffer);
+    });
+
+    if (!$process->isSuccessful()) {
+        Log::error('Process failed: ' . $process->getErrorOutput());
+    } else {
+        Log::info('process: clear');
+    }
+
+    return $path;
+}
 }

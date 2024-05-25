@@ -19,7 +19,8 @@ const path = process.argv[3];
         await browser.close();
         process.exit(0);
     } catch (error) {
-        console.error('Failed to generate screenshot:', error);
+        console.error('Failed to generate screenshot:', error.message);
+        console.error('Stack:', error.stack);
         process.exit(1);
     }
 })();

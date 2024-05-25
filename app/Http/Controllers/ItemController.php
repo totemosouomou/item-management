@@ -260,9 +260,12 @@ class ItemController extends Controller
                     'post' => $securePost . " by " . Auth::user()->name,
                 ]);
             }
+            Log::info('item: ' . $item);
+            Log::info('securePost: ' . $securePost);
 
             // スクリーンショットを生成
             $screenshotPath = $this->generateScreenshot($item->url, $item->id, 'bookmarks');
+            Log::info('screenshotPath: ' . $screenshotPath);
 
             // Base64 エンコード
             $imageData = file_get_contents($screenshotPath);
@@ -517,17 +520,22 @@ class ItemController extends Controller
         if (!file_exists($storagePath)) {
             mkdir($storagePath, 0755, true);
         }
-
+        Log::info('storagePath: ' . $storagePath);
+    
         $filename = $name . '.png';
         $path = $storagePath . '/' . $filename;
-
+        Log::info('path: ' . $path);
+    
         $process = new Process(['node', base_path('screenshot.js'), $url, $path]);
+        Log::info('process: ' . $process);
         $process->run();
-
+    
         if (!$process->isSuccessful()) {
+            Log::error('Failed to generate screenshot: ' . $process->getErrorOutput());
             throw new \RuntimeException('Failed to generate screenshot: ' . $process->getErrorOutput());
         }
-
+    
         return $path;
     }
+    
 }

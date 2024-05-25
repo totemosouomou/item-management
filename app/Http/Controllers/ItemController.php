@@ -528,9 +528,9 @@ class ItemController extends Controller
         Log::info('path: ' . $path);
     
         $process = new Process(['node', base_path('screenshot.js'), $url, $path]);
-        Log::info('process: ' . $process);
         $process->run();
-    
+        Log::info('process: clear');
+
         if (!$process->isSuccessful()) {
             Log::error('Failed to generate screenshot: ' . $process->getErrorOutput());
             throw new \RuntimeException('Failed to generate screenshot: ' . $process->getErrorOutput());

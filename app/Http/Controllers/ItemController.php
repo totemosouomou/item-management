@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Process;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\PeriodCalculator;
@@ -263,17 +264,31 @@ class ItemController extends Controller
             // スクリーンショットを生成
             $screenshotPath = $this->generateScreenshot($item->url, $item->id, 'bookmarks');
 
-            // Base64 エンコード
-            $imageData = file_get_contents($screenshotPath);
-            $base64Image = base64_encode($imageData);
-            $mimeType = 'image/png';
+            if ($screenshotPath) {
+                // Base64 エンコード
+                $imageData = file_get_contents($screenshotPath);
+                $base64Image = base64_encode($imageData);
+                $mimeType = 'image/png';
 
-            // ブックマーク登録
-            Bookmark::create([
-                'user_id' => Auth::id(),
-                'item_id' => $item->id,
-                'thumbnail' => 'data:' . $mimeType . ';base64,' . $base64Image,
-            ]);
+                // ブックマーク登録
+                Bookmark::create([
+                    'user_id' => Auth::id(),
+                    'item_id' => $item->id,
+                    'thumbnail' => 'data:' . $mimeType . ';base64,' . $base64Image,
+                ]);
+
+            // スクリーンショットの生成に失敗した場合の処理
+            } else {
+                // エラーに関するログを出力
+                Log::error('Failed to generate screenshot for item ID: ' . $item->id);
+
+                // ブックマーク登録
+                Bookmark::create([
+                    'user_id' => Auth::id(),
+                    'item_id' => $item->id,
+                    'thumbnail' => null,
+                ]);
+            }
 
             return redirect("/items/{$period}")->with('success', '記事が登録されました。');
         }
@@ -505,30 +520,30 @@ class ItemController extends Controller
      * @param string $dirname
      * @return string
      */
-public function generateScreenshot($url, $name, $dirname)
-{
-    // フォルダが存在しない場合は作成
-    $storagePath = '/tmp';
-    if (!file_exists($storagePath)) {
-        mkdir($storagePath, 0755, true);
+    public function generateScreenshot($url, $name, $dirname)
+    {
+        // フォルダが存在しない場合は作成
+        $storagePath = storage_path('app/public/' . $dirname);
+        if (!file_exists($storagePath)) {
+            mkdir($storagePath, 0755, true);
+        }
+        Log::info('storagePath: ' . $storagePath);
+
+        $filename = $name . '.png';
+        $path = $storagePath . '/' . $filename;
+        Log::info('path: ' . $path);
+
+        $process = new Process(['node', base_path('screenshot.js'), $url, $path]);
+        $process->run(function ($type, $buffer) {
+            Log::info('Process output: ' . $buffer);
+        });
+
+        if (!$process->isSuccessful()) {
+            Log::error('Process failed: ' . $process->getErrorOutput());
+        } else {
+            Log::info('process: clear');
+        }
+
+        return $path;
     }
-    Log::info('storagePath: ' . $storagePath);
-
-    $filename = $name . '.png';
-    $path = $storagePath . '/' . $filename;
-    Log::info('path: ' . $path);
-
-    $process = new Process(['node', base_path('screenshot.js'), $url, $path]);
-    $process->run(function ($type, $buffer) {
-        Log::info('Process output: ' . $buffer);
-    });
-
-    if (!$process->isSuccessful()) {
-        Log::error('Process failed: ' . $process->getErrorOutput());
-    } else {
-        Log::info('process: clear');
-    }
-
-    return $path;
-}
 }

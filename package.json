@@ -4,7 +4,7 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "test-puppeteer": "node -e \"const puppeteer = require('puppeteer'); console.log('Puppeteer is installed');\""
+        "heroku-postbuild": "mkdir ./.cache && mv /app/.cache/puppeteer ./.cache"
     },
     "devDependencies": {
         "@popperjs/core": "^2.11.6",

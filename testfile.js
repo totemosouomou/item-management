@@ -1,18 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 
-const directory = process.argv[2];
-const filename = process.argv[3];
-const content = process.argv[4];
+// 引数からディレクトリ名とファイルパスを取得
+const dirname = process.argv[2];
+const filepath = path.join('/tmp', dirname, 'testfile.txt');
 
-const filePath = path.join(directory, filename);
-
-// フォルダが存在しない場合は作成
-if (!fs.existsSync(directory)) {
-    fs.mkdirSync(directory, { recursive: true });
+// ディレクトリが存在しない場合は作成
+if (!fs.existsSync(path.join('/tmp', dirname))) {
+    fs.mkdirSync(path.join('/tmp', dirname), { recursive: true });
 }
 
-// ファイルに内容を書き込む
-fs.writeFileSync(filePath, content, 'utf8');
-
-console.log(`File written to ${filePath}`);
+// ファイルに書き込み
+fs.writeFileSync(filepath, 'Hello, Heroku!', 'utf8');
+console.log('File written to', filepath);

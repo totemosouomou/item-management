@@ -530,23 +530,21 @@ class ItemController extends Controller
         Log::info('storagePath: ' . $storagePath);
 
         $filename = $name . '.txt';
-        $filePath = $storagePath . '/' . $filename;
-        Log::info('filePath: ' . $filePath);
+        $path = $storagePath . '/' . $filename;
+        Log::info('path: ' . $path);
 
-        $content = 'Hello, Heroku!';
-
-        // Node.js スクリプトを実行してファイルに書き込む
-        $process = new Process(['node', base_path('testfile.js'), $storagePath, $filename, $content]);
+        $process = new Process(['node', base_path('testfile.js'), $dirname]);
         $process->run(function ($type, $buffer) {
             Log::info('Process output: ' . $buffer);
         });
 
         if (!$process->isSuccessful()) {
             Log::error('Process failed: ' . $process->getErrorOutput());
-            return null;
         } else {
             Log::info('process: clear');
-            return $filePath;
         }
+
+        // 作成されたファイルのパスを返す
+        return $path;
     }
 }

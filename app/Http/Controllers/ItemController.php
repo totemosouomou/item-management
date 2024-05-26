@@ -523,7 +523,8 @@ class ItemController extends Controller
     public function generateScreenshot($url, $name, $dirname)
     {
         // フォルダが存在しない場合は作成
-        $storagePath = storage_path('app/public/' . $dirname);
+        // $storagePath = storage_path('app/public/' . $dirname);
+        $storagePath = '/tmp';
         if (!file_exists($storagePath)) {
             mkdir($storagePath, 0755, true);
         }

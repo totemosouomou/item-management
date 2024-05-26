@@ -523,28 +523,30 @@ class ItemController extends Controller
     public function generateScreenshot($url, $name, $dirname)
     {
         // フォルダが存在しない場合は作成
-        // $storagePath = storage_path('app/public/' . $dirname);
-        $storagePath = '/tmp';
+        $storagePath = '/tmp/' . $dirname;
         if (!file_exists($storagePath)) {
             mkdir($storagePath, 0755, true);
         }
         Log::info('storagePath: ' . $storagePath);
 
-        $filename = $name . '.png';
-        $path = $storagePath . '/' . $filename;
-        Log::info('path: ' . $path);
+        $filename = $name . '.txt';
+        $filePath = $storagePath . '/' . $filename;
+        Log::info('filePath: ' . $filePath);
 
-        // $process = new Process(['node', base_path('screenshot.js'), $url, $path]);
-        // $process->run(function ($type, $buffer) {
-        //     Log::info('Process output: ' . $buffer);
-        // });
+        $content = 'Hello, Heroku!';
 
-        // if (!$process->isSuccessful()) {
-        //     Log::error('Process failed: ' . $process->getErrorOutput());
-        // } else {
-        //     Log::info('process: clear');
-        // }
+        // Node.js スクリプトを実行してファイルに書き込む
+        $process = new Process(['node', base_path('testfile.js'), $storagePath, $filename, $content]);
+        $process->run(function ($type, $buffer) {
+            Log::info('Process output: ' . $buffer);
+        });
 
-        return $path;
+        if (!$process->isSuccessful()) {
+            Log::error('Process failed: ' . $process->getErrorOutput());
+            return null;
+        } else {
+            Log::info('process: clear');
+            return $filePath;
+        }
     }
 }

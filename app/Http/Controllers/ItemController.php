@@ -533,16 +533,16 @@ class ItemController extends Controller
         $path = $storagePath . '/' . $filename;
         Log::info('path: ' . $path);
 
-        $process = new Process(['node', base_path('screenshot.js'), $url, $path]);
-        $process->run(function ($type, $buffer) {
-            Log::info('Process output: ' . $buffer);
-        });
+        // $process = new Process(['node', base_path('screenshot.js'), $url, $path]);
+        // $process->run(function ($type, $buffer) {
+        //     Log::info('Process output: ' . $buffer);
+        // });
 
-        if (!$process->isSuccessful()) {
-            Log::error('Process failed: ' . $process->getErrorOutput());
-        } else {
-            Log::info('process: clear');
-        }
+        // if (!$process->isSuccessful()) {
+        //     Log::error('Process failed: ' . $process->getErrorOutput());
+        // } else {
+        //     Log::info('process: clear');
+        // }
 
         return $path;
     }

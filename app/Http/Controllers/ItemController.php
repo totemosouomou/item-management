@@ -266,15 +266,16 @@ class ItemController extends Controller
 
             if ($screenshotPath) {
                 // Base64 エンコード
-                $imageData = file_get_contents($screenshotPath);
-                $base64Image = base64_encode($imageData);
-                $mimeType = 'image/png';
+                // $imageData = file_get_contents($screenshotPath);
+                // $base64Image = base64_encode($imageData);
+                // $mimeType = 'image/png';
 
                 // ブックマーク登録
                 Bookmark::create([
                     'user_id' => Auth::id(),
                     'item_id' => $item->id,
-                    'thumbnail' => 'data:' . $mimeType . ';base64,' . $base64Image,
+                    'thumbnail' => null,
+                    // 'thumbnail' => 'data:' . $mimeType . ';base64,' . $base64Image,
                 ]);
 
             // スクリーンショットの生成に失敗した場合の処理

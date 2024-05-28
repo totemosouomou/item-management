@@ -10,6 +10,7 @@ console.log(url, path, storagePath);
 (async () => {
     try {
         const browser = await puppeteer.launch({
+            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/app/.cache/puppeteer/chrome/chrome-linux/chrome',
             userDataDir: storagePath,
         });
         const page = await browser.newPage();

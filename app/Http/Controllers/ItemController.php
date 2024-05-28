@@ -261,29 +261,18 @@ class ItemController extends Controller
                 ]);
             }
 
-            // スクリーンショットを生成
-            $screenshotPath = $this->generateScreenshot($item->url, $item->id, 'bookmarks');
-
-            if ($screenshotPath) {
-                // Base64 エンコード
-                // $imageData = file_get_contents($screenshotPath);
-                // $base64Image = base64_encode($imageData);
-                // $mimeType = 'image/png';
-
-                // ブックマーク登録
+            // ブックマーク登録
+            $filePath = $this->generateScreenshot($item->url, $item->id);
+            if ($filePath) {
+                $imageData = file_get_contents($filePath);
+                $base64Image = base64_encode($imageData);
+                $mimeType = 'image/png';
                 Bookmark::create([
                     'user_id' => Auth::id(),
                     'item_id' => $item->id,
-                    'thumbnail' => null,
-                    // 'thumbnail' => 'data:' . $mimeType . ';base64,' . $base64Image,
+                    'thumbnail' => 'data:' . $mimeType . ';base64,' . $base64Image,
                 ]);
-
-            // スクリーンショットの生成に失敗した場合の処理
             } else {
-                // エラーに関するログを出力
-                Log::error('Failed to generate screenshot for item ID: ' . $item->id);
-
-                // ブックマーク登録
                 Bookmark::create([
                     'user_id' => Auth::id(),
                     'item_id' => $item->id,
@@ -517,35 +506,132 @@ class ItemController extends Controller
      * スクリーンショットを生成
      *
      * @param string $url
-     * @param string $name
-     * @param string $dirname
+     * @param string $itemId
      * @return string
      */
-    public function generateScreenshot($url, $name, $dirname)
+    public function generateScreenshot($url, $itemId)
     {
-        // フォルダが存在しない場合は作成
-        $storagePath = '/tmp/' . $dirname;
-        if (!file_exists($storagePath)) {
-            mkdir($storagePath, 0755, true);
-        }
-        Log::info('storagePath: ' . $storagePath);
+        // スクリーンショットの保存先パスを設定
+        $path = base_path('tmp/bookmarks/' . $itemId . '.png');
 
-        $filename = $name . '.txt';
-        $path = $storagePath . '/' . $filename;
-        Log::info('path: ' . $path);
+        // ストレージパスを設定
+        $storagePath = base_path('tmp/bookmarks');
 
-        $process = new Process(['node', base_path('testfile.js'), $dirname]);
-        $process->run(function ($type, $buffer) {
-            Log::info('Process output: ' . $buffer);
-        });
+        // screenshot.jsのパスを設定
+        $screenshotScriptPath = base_path('screenshot.js');
 
-        if (!$process->isSuccessful()) {
-            Log::error('Process failed: ' . $process->getErrorOutput());
+        // screenshot.jsを起動するコマンドを生成
+        $command = "node $screenshotScriptPath $url $path $storagePath";
+        // dd($command);
+
+        // コマンドを実行
+        exec($command, $output, $return);
+
+        // 出力をスペースで分割し、ファイルパスの部分を取得
+        $filePath = explode(' ', $output[0])[1];
+
+        // コマンドの実行結果をログに記録
+        if ($return === 0) {
+            \Log::info('Screenshot saved successfully.');
         } else {
-            Log::info('process: clear');
+            \Log::error('Failed to generate screenshot.');
         }
 
-        // 作成されたファイルのパスを返す
-        return $path;
+        return $filePath;
     }
+
+    /**
+     * 管理用スクリーンショット生成プロセス
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function handleBookmarkChecked()
+    {
+        // スクリーンショットが未生成のブックマークを取得
+        $bookmarks = Bookmark::with('item')->whereNull('thumbnail')->get();
+
+        // 各ブックマークに対してスクリーンショットを生成
+        foreach ($bookmarks as $bookmark) {
+            $filePath = $this->generateScreenshot($bookmark->item->url, $bookmark->item->id);
+
+            // 画像データの読み込みとBase64エンコード
+            $imageData = file_get_contents($filePath);
+            $base64Image = base64_encode($imageData);
+            $mimeType = 'image/png';
+
+            // ブックマークを更新してスクリーンショットを保存
+            Bookmark::where('item_id', $bookmark->item->id)->update([
+                'thumbnail' => 'data:' . $mimeType . ';base64,' . $base64Image,
+            ]);
+        }
+
+        return response()->json(['message' => 'Bookmark screenshot generation process started.']);
+    }
+
+// public function generateScreenshot($url, $itemId)
+// {
+//     // フォルダが存在しない場合は作成
+//     $storagePath = '/tmp/bookmarks';
+//     if (!file_exists($storagePath)) {
+//         mkdir($storagePath, 0755, true);
+//     }
+
+//         // ファイルパスの生成
+//         $filename = $itemId . '.png';
+//         $path = $storagePath . '/' . $filename;
+
+//         // プロセスの実行
+//         $nodeScript = base_path('screenshot.js');
+//         $nodePath = env('NODE_PATH', 'node'); // デフォルトは 'node'
+
+//         // Node.js スクリプトを実行するためのプロセスを作成
+//         $process = new Process([$nodePath, $nodeScript, $url, $path, $storagePath]);
+//         $process->run();
+
+//         // プロセスの実行結果を確認
+//         if ($process->isSuccessful()) {
+//             // 成功時の処理
+//             return $path; // 成功した場合、生成されたファイルのパスを返す
+//         } else {
+//             // 失敗時の処理
+//             $errorOutput = $process->getErrorOutput(); // エラー出力を取得
+
+//             if (strpos($errorOutput, 'TimeoutError') !== false) {
+//                 // タイムアウトエラーが発生した場合
+//                 throw new \RuntimeException('Timeout error occurred while generating screenshot.');
+//             } else {
+//                 // その他のエラーが発生した場合
+//                 $errorMessage = 'Failed to generate screenshot: ' . $errorOutput;
+
+//                 // エラーメッセージを詳細にデバッグするための条件分岐
+//                 if (strpos($errorOutput, 'ENOTCONN') !== false) {
+//                     $errorMessage .= ' (ENOTCONN error occurred)';
+//                 }
+//                 if (strpos($errorOutput, 'ECONNRESET') !== false) {
+//                     $errorMessage .= ' (ECONNRESET error occurred)';
+//                 }
+
+//                 throw new \RuntimeException($errorMessage);
+//             }
+//         }
+//         dd($nodePath, $nodeScript, $url, $path);
+
+
+//         // 画像データの読み込みとBase64エンコード
+//         $imageData = file_get_contents($path);
+//         $base64Image = base64_encode($imageData);
+//         $mimeType = 'image/png';
+
+//         // ブックマーク更新
+//         Bookmark::where('id', $itemId)->update([
+//             'thumbnail' => 'data:' . $mimeType . ';base64,' . $base64Image,
+//         ]);
+
+//         // ログの出力
+//         Log::info('Screenshot generated successfully for item ' . $itemId . ' at path: ' . $path);
+
+//         // 作成されたファイルのパスを返す
+//         return $path;
+// }
+
 }

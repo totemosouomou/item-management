@@ -21,6 +21,10 @@ Route::post('register/{token?}', [App\Http\Controllers\Auth\RegisterController::
 Route::get('/users/add', [App\Http\Controllers\UserController::class, 'create']);
 Route::match(['get', 'post'], '/users/store', [App\Http\Controllers\UserController::class, 'store']);
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/bookmark', [App\Http\Controllers\ItemController::class, 'handleBookmarkChecked'])->name('Bookmark.checked');
+});
+
 Auth::routes();
 
 Route::match(['get', 'post'], '/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

@@ -1,12 +1,16 @@
 import puppeteer from 'puppeteer';
 
+// コマンドライン引数からURLと保存先のパスを取得する
 const url = process.argv[2];
 const path = process.argv[3];
+const storagePath = process.argv[4];
+
+console.log(url, path, storagePath);
 
 (async () => {
     try {
         const browser = await puppeteer.launch({
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            userDataDir: storagePath,
         });
         const page = await browser.newPage();
 
@@ -14,13 +18,12 @@ const path = process.argv[3];
         await page.goto(url, { waitUntil: 'networkidle2' });
 
         // ページ全体のスクリーンショットを撮る
-        await page.screenshot({ path, fullPage: true });
+        await page.screenshot({ path: path, fullPage: true });
 
         await browser.close();
-        process.exit(0);
+        console.log('Screenshot saved successfully.');
     } catch (error) {
-        console.error('Failed to generate screenshot:', error.message);
-        console.error('Stack:', error.stack);
+        console.error('Failed to generate screenshot:', error);
         process.exit(1);
     }
 })();

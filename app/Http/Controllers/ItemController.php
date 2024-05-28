@@ -262,23 +262,23 @@ class ItemController extends Controller
             }
 
             // ブックマーク登録
-            $filePath = $this->generateScreenshot($item->url, $item->id);
-            if ($filePath) {
-                $imageData = file_get_contents($filePath);
-                $base64Image = base64_encode($imageData);
-                $mimeType = 'image/png';
-                Bookmark::create([
-                    'user_id' => Auth::id(),
-                    'item_id' => $item->id,
-                    'thumbnail' => 'data:' . $mimeType . ';base64,' . $base64Image,
-                ]);
-            } else {
+            // $filePath = $this->generateScreenshot($item->url, $item->id);
+            // if ($filePath) {
+            //     $imageData = file_get_contents($filePath);
+            //     $base64Image = base64_encode($imageData);
+            //     $mimeType = 'image/png';
+            //     Bookmark::create([
+            //         'user_id' => Auth::id(),
+            //         'item_id' => $item->id,
+            //         'thumbnail' => 'data:' . $mimeType . ';base64,' . $base64Image,
+            //     ]);
+            // } else {
                 Bookmark::create([
                     'user_id' => Auth::id(),
                     'item_id' => $item->id,
                     'thumbnail' => null,
                 ]);
-            }
+            // }
 
             return redirect("/items/{$period}")->with('success', '記事が登録されました。');
         }

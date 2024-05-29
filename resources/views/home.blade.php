@@ -48,7 +48,7 @@
                                     <a href="{{ $randomItem->url }}" data-iframely-url="//cdn.iframe.ly/api/iframe?url={{ $randomItem->url }}&media=0&api_key={{ config('iframely.api.key') }}"></a>
                                 </div>
                                 <div class="form-group" style="position: relative; top: 145px;">
-                                    <form method="POST" action="{{ url('items/update') }}">
+                                    <form method="post" action="{{ url('items/update') }}">
                                         @csrf
                                         @php
                                             $userPost = $randomItem->posts->where('user_id', auth()->id())->first();

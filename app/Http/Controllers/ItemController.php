@@ -174,6 +174,7 @@ class ItemController extends Controller
                 $query->where('user_id', $user_id)
                     ->orWhereIn('id', $bookmarkedItemIds); // ブックマークされたアイテムIDを含む
             });
+            $title_name = '最大4件（ピン付き）';
 
         // ユーザーIDが指定されている場合の処理
         } elseif ($user_id) {
@@ -200,7 +201,39 @@ class ItemController extends Controller
 
         // ユーザーIDが指定されている場合の処理
         if ($user_id && $user == Auth::user()) {
-            return view('item.bookmark', compact('stage', 'titleNames', 'items', 'title_name', 'period', 'articles'))->with('requestSearch', $requestSearch)->with('urlInput', session('urlInput'));
+
+            // ピンが付いた記事を取得
+            $pinnedItems = $items->filter(function($item) {
+                return $item->bookmarks->contains(function($bookmark) {
+                    return !is_null($bookmark->pinned_at);
+                });
+            });
+
+            // ピンは最大4つまでの処理
+            if (!$request->session()->get('success') && $pinnedItems->count() > 4) {
+                $pinnedItems = $pinnedItems->sortByDesc(function($item) {
+                    return $item->bookmarks->whereNotNull('pinned_at')->first()->pinned_at;
+                });
+
+                // 最新の4つ以外の記事からピンを外す
+                $itemsToUnpin = $pinnedItems->slice(4);
+                foreach ($itemsToUnpin as $item) {
+                    $bookmark = $item->bookmarks->whereNotNull('pinned_at')->first();
+                    if ($bookmark) {
+                        $bookmark->pinned_at = null;
+                        $bookmark->save();
+                    }
+                }
+
+                // ピンが付いた記事を再取得
+                $pinnedItems = $pinnedItems->take(4);
+
+            }
+
+            // ピンが付いていない記事を取得
+            $unpinnedItems = $items->diff($pinnedItems);
+
+            return view('item.bookmark', compact('stage', 'titleNames', 'items', 'title_name', 'period', 'articles', 'pinnedItems', 'unpinnedItems'))->with('requestSearch', $requestSearch)->with('urlInput', session('urlInput'));
         }
 
         return view('item.index', compact('stage', 'titleNames', 'items', 'title_name', 'period', 'articles'))->with('requestSearch', $requestSearch)->with('urlInput', session('urlInput'));
@@ -280,7 +313,12 @@ class ItemController extends Controller
                 ]);
             // }
 
-            return redirect("/items/{$period}")->with('success', '記事が登録されました。');
+            // 記事一覧ページへ遷移
+            if (strpos($request->headers->get('referer'), 'items/user/') !== false) {
+                return back()->with('success', '記事が登録されました。');
+            } else {
+                return redirect("/items/{$period}")->with('success', '記事が登録されました。');
+            }
         }
 
         return redirect("/items/{$period}")->with('add', "記事登録")->with('urlInput', $this->secure($urlInput));
@@ -298,7 +336,7 @@ class ItemController extends Controller
         if ($request->isMethod('post')) {
 
             // 更新前の記事とコメントを取得
-            $item = Item::findOrFail($request->id);
+            $item = Item::find($request->id);
             $postBeforeUpdate = Post::where('user_id', Auth::id())
                 ->where('item_id', $request->id)
                 ->first();
@@ -374,7 +412,7 @@ class ItemController extends Controller
     }
 
     /**
-     * 記事削除
+     * 記事削除（ブックマーク削除）
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -387,25 +425,29 @@ class ItemController extends Controller
             // 削除する記事を取得
             $item = Item::find($request->id);
 
-            // 記事が存在するか確認
             if ($item) {
 
-                // 記事と関連するコメントを削除
-                $item->posts()->delete();
-                $item->delete();
+                // ユーザーが記事の所有者であれば、記事を削除
+                if ($item->user_id == Auth::id()) {
+                    $item->posts()->delete();
+                    $item->bookmarks()->delete();
+                    $item->delete();
 
-                // スクリーンショットを削除
-                $thumbnailPath = storage_path('app/public/bookmarks/' . $item->id . '.png');
-                if (file_exists($thumbnailPath)) {
-                    unlink($thumbnailPath);
+                    return back()->with('success', '記事を削除しました。');
+
+                // 記事のブックマークを削除
+                } else {
+                    $item->bookmarks()->delete();
+
+                    return back()->with('success', 'ブックマークを削除しました。');
                 }
-
-                return back()->with('success', '記事を削除しました。');
-            } else {
-                return back()->with('error', '指定された記事が見つかりませんでした。');
             }
+
+            // 記事が存在しない場合
+            return back()->with('error', '指定された記事が見つかりませんでした。');
         }
 
+        // POSTリクエストでない場合、リダイレクト
         return redirect('/items')->with('error', '指定された記事が見つかりませんでした。');
     }
 
@@ -477,9 +519,6 @@ class ItemController extends Controller
             // アイテムIDを取得
             $itemId = $request->input('itemId');
 
-            // アイテムのURLを取得
-            $url = $request->input('url');
-
             // ユーザーが既にこのアイテムにブックマークを付けているか確認
             $bookmark = Bookmark::where('user_id', Auth::id())->where('item_id', $itemId)->first();
 
@@ -501,6 +540,120 @@ class ItemController extends Controller
 
         return abort(404)->with('error', 'エラーが発生し処理が完了しませんでした。');
     }
+
+    /**
+     * 記事のピン
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function pinItem(Request $request)
+    {
+        // POSTリクエストのとき
+        if ($request->isMethod('post')) {
+
+            // ユーザーが既にピンを付けている記事をカウントする
+            $pinnedCount = Bookmark::where('user_id', Auth::id())->whereNotNull('pinned_at')->count();
+
+            // ブックマークを取得
+            $bookmarkId = $request->input('bookmarkId');
+            $bookmark = Bookmark::find($bookmarkId);
+
+            if (!$bookmark || $bookmark->user_id !== Auth::id()) {
+                return back()->with('error', '指定された記事が見つかりませんでした。');
+            }
+
+            // ピンは最大4つまでの処理
+            if ($pinnedCount < 4) {
+
+                // ピンを外す
+                if ($bookmark->pinned_at) {
+                    $bookmark->pinned_at = null;
+                    $bookmark->save();
+                    return back()->with('success', 'ピンを外しました。');
+
+                // ピンを付ける
+                } else {
+                    $bookmark->pinned_at = now();
+                    $bookmark->save();
+                    return back()->with('success', 'ピンを付けました。');
+                }
+
+            // ピンが5つを超えないようにする処理
+            } else {
+
+                // ピンを外す
+                if ($bookmark->pinned_at) {
+                    $bookmark->pinned_at = null;
+                    $bookmark->save();
+                    return back()->with('success', 'ピンを外しました。');
+
+                // ピンを付ける
+                } else {
+                    $bookmark->pinned_at = now();
+                    $bookmark->save();
+
+                    return back()->with('success', 'ピンが付けられる最大4件の上限に達しました。ピンを外す記事をクリックしてください。');
+                }
+            }
+        }
+
+        return abort(404)->with('error', 'エラーが発生し処理が完了しませんでした。');
+    }
+
+    /**
+     * 古いピンを保持して新しいピンを無視する
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function keepOldPin(Request $request)
+    {
+        // POSTリクエストのとき
+        if ($request->isMethod('post')) {
+
+            // 処理を続けるためのロジック
+            $bookmarkId = $request->input('bookmarkId');
+
+            return response()->json(['status' => '過去に付けたピンを保持しました。']);
+        }
+
+        return abort(404)->with('error', 'エラーが発生し処理が完了しませんでした。');
+    }
+
+    /**
+     * 古いピンを外して新しいピンを付ける
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function replaceOldPin(Request $request)
+    {
+        // POSTリクエストのとき
+        if ($request->isMethod('post')) {
+
+            $oldBookmarkId = $request->input('old_bookmarkId');
+            $newBookmarkId = $request->input('new_bookmarkId');
+
+            // 古いピンを外す
+            $oldBookmark = Bookmark::find($oldBookmarkId);
+            if ($oldBookmark) {
+                $oldBookmark->pinned_at = null;
+                $oldBookmark->save();
+            }
+
+            // 新しいピンを付ける
+            $newBookmark = Bookmark::find($newBookmarkId);
+            if ($newBookmark) {
+                $newBookmark->pinned_at = now();
+                $newBookmark->save();
+            }
+
+            return response()->json(['status' => '過去に付けたピンを外し、新しい記事にピンを付けなおしました。']);
+        }
+
+    return abort(404)->with('error', 'エラーが発生し処理が完了しませんでした。');
+}
 
     /**
      * スクリーンショットを生成

@@ -45,4 +45,5 @@ Route::prefix('items')->group(function () {
     Route::match(['get', 'post'], '/delete', [App\Http\Controllers\ItemController::class, 'delete']);
     Route::match(['get', 'post'], '/flag', [App\Http\Controllers\ItemController::class, 'flagItem']);
     Route::match(['get', 'post'], '/bookmark', [App\Http\Controllers\ItemController::class, 'bookmarkItem']);
+    Route::match(['get', 'post'], '/pin', [App\Http\Controllers\ItemController::class, 'pinItem']);
 });

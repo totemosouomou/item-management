@@ -30,7 +30,7 @@
             @endif
 
             <div class="card">
-                <div class="card-header">
+                <div class="card-header card-container">
                     <h3 class="card-title">{{ $title_name }}を表示</h3>
                     <div class="card-tools">
                         <button class="add-btn" style="font-weight: bold;" data-toggle="modal" data-target="#urlModalAdd">
@@ -69,7 +69,7 @@
 
                                         <!-- 投稿用テキストボックス -->
                                         <div>
-                                            <form method="POST" action="{{ url('items/add') }}">
+                                            <form method="post" action="{{ url('items/add') }}">
                                             @csrf
                                             <div class="row">
                                                 <div class="col-sm-1">
@@ -164,7 +164,7 @@
                                             @endforeach
                                         </ul>
                                         @if (!$userPost)
-                                            <form method="POST" action="{{ url('items/update') }}" id="userPost_{{ $item->id }}">
+                                            <form method="post" action="{{ url('items/update') }}" id="userPost_{{ $item->id }}">
                                                 @csrf
                                                 <div class="row mx-2 mt-2">
                                                     <div class="col-sm-1">
@@ -185,7 +185,7 @@
 
                                             <!-- 編集用テキストボックス -->
                                             <div id="editBox_{{ $item->id }}" style="display: none;">
-                                                <form method="POST" action="{{ url('items/update') }}">
+                                                <form method="post" action="{{ url('items/update') }}">
                                                 @csrf
                                                 <div class="row">
                                                     <div class="col-sm-1">
@@ -230,7 +230,7 @@
                                                 </div>
                                                 @if(auth()->id() == $item->user_id)
                                                     <div id="deleteBtn_{{ $item->id }}" class="d-flex delete-form m-2 ml-4">
-                                                        <form method="POST" action="{{ url('items/delete') }}" id="delete-form_{{ $item->id }}">
+                                                        <form method="post" action="{{ url('items/delete') }}" id="delete-form_{{ $item->id }}">
                                                             @csrf
                                                             <input type="hidden" name="id" value="{{ $item->id }}">
                                                             <p id="delete-btn_{{ $item->id }}" class="btn btn-outline-danger rounded-pill btn-size delete-btn" onclick="deleteItem('{{ $item->id }}');">削除</p>
@@ -249,23 +249,24 @@
                                     </div>
                                 </div>
                             </div>
-                            @endforeach
-                            @else
-                                <p>No articles found.</p>
-                            @endif
-                        </div>
+                        @endforeach
+                        @else
+                            <p>No articles found.</p>
+                        @endif
                     </div>
-
-                    <!-- ページネーション -->
-                    @if ($items->hasPages())
-                        <div class="card-footer clearfix pb-0">
-                            {{ $items->appends(['search' => implode(' ', (array)session('requestSearch', []))])->links() }}
-                        </div>
-                    @endif
                 </div>
 
-                <!-- Qitta記事をapiで取得 -->
-                @include('item.articles')
+                <!-- ページネーション -->
+                @if ($items->hasPages())
+                    <div class="card-footer clearfix pb-0">
+                        {{ $items->appends(['search' => implode(' ', (array)session('requestSearch', []))])->links() }}
+                    </div>
+                @endif
+            </div>
+
+            <!-- Qitta記事をapiで取得 -->
+            @include('item.articles')
+
             </div>
         </div>
     </div>

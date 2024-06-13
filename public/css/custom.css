@@ -385,3 +385,35 @@
     margin-left: 0 !important;
   }
 }
+
+/* 段階的にサイズを変更 */
+@media (max-width: 750px) {
+  .img-container:hover {
+    transform: scale(7);
+    right: 265px;
+  }
+}
+@media (max-width: 650px) {
+  .img-container:hover {
+    transform: scale(6);
+    right: 215px;
+  }
+}
+@media (max-width: 550px) {
+  .img-container:hover {
+    transform: scale(5);
+    right: 170px;
+  }
+}
+@media (max-width: 460px) {
+  .img-container:hover {
+    transform: scale(4);
+    right: 130px;
+  }
+}
+@media (max-width: 375px) {
+  .img-container:hover {
+    transform: scale(3);
+    right: 100px;
+  }
+}

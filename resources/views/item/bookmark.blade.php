@@ -174,7 +174,7 @@
                                 </div>
                                 @if ($item->bookmarks->isNotEmpty() && $item->bookmarks->first()->thumbnail)
                                     <div class="img-container" id="{{ $item->id }}">
-                                        <img src="{{ $item->bookmarks->first()->thumbnail }}" alt="Thumbnail">
+                                        <img src="{{ $item->bookmarks->first()->thumbnail }}" alt="Thumbnail" onClick="event.preventDefault();">
                                     </div>
                                 @endif
                             </figure>

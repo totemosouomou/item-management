@@ -90,8 +90,8 @@ class UsersTableSeeder extends Seeder
 
         DB::table('users')->insert($users);
         DB::table('users')->where('id', 1)->update([
-            'name' => '丸岡太郎/12月3日',
-            'email' => 'taro@techis.jp',
+            'name' => 'MARUOKA/12月3日',
+            'email' => 'maruoka@example.com',
             'created_at' => '2023-12-03',
             'updated_at' => '2023-12-03',
         ]);

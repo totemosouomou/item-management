@@ -183,7 +183,7 @@
                             <form method="post" action="{{ url('items/pin') }}" class="mt-1 mb-3">
                                 @csrf
                                 <input type="hidden" name="id" value="{{ $item->id }}">
-                                <input type="hidden" name="bookmarkId" value="{{ $item->bookmarks->first()->id }}">
+                                <input type="hidden" name="bookmarkId" value="{{ $item->bookmarks->first() ? $item->bookmarks->first()->id : '' }}">
                                 <button type="submit" class="py-1 btn rounded-pill btn-size submit-btn">ピン</button>
                             </form>
                             <form method="post" action="{{ url('items/delete') }}">
